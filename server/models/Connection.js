@@ -45,6 +45,7 @@ class Connection {
                 data: room
             };
             // client receive 'create_room' message -> show new room game in front end
+            console.log("create room");
             this.sendAllUserOnline(message);
         }).catch((err) => {
             console.log("error: ", err);
@@ -126,24 +127,47 @@ class Connection {
         const sender = lodash.get(data,'sender');
         const result = lodash.get(data, 'result');
 
-        const room = await this.app.models.room.findRoomById(roomId)
-            const message = {
-                header: 'game_result',
-                data:
-                {
-                    result: result
-                }
-            }
-            console.log("serder: " +sender);
-            console.log("host: " + room.host);
-            if(sender == room.host)
+        const room = await this.app.models.room.findRoomById(roomId);
+        console.log("room: " + JSON.stringify(room));
+        const message = {
+            header: 'game_result',
+            data:
             {
-                console.log("send to guest: " + room.guest_socket)
-                this.sendMessage((this.listConnections.get(room.guest_socket)).ws,message);
-            } else {
-                console.log("send to guest: " + room.guest_socket)
-                this.sendMessage((this.listConnections.get(room.host_socket)).ws,message);
+                result: result
             }
+        }
+        let winner = "";
+        if(sender == room.host)                       // host win or draw
+        {
+            if(result === 'lose') {                // always send loss message
+                winner = sender;
+                await this.app.models.user.updateUser(room.host_id, 'win', room);
+                await this.app.models.user.updateUser(room.guest_id, 'lose', room);
+            } else {
+                await this.app.models.user.updateUser(room.host_id, 'draw', room);
+                await this.app.models.user.updateUser(room.guest_id, 'draw', room);
+            }
+            this.sendMessage((this.listConnections.get(room.guest_socket)).ws,message);
+        } else {                                      // guest win or draw
+            if(result === 'lose') {
+                winner = sender;
+                await this.app.models.user.updateUser(room.host_id, 'lose', room);
+                await this.app.models.user.updateUser(room.guest_id, 'win', room);
+            } else {
+                await this.app.models.user.updateUser(room.host_id, 'draw', room);
+                await this.app.models.user.updateUser(room.guest_id, 'draw', room);
+            }
+            this.sendMessage((this.listConnections.get(room.host_socket)).ws,message);
+        }
+        const game = {
+            host: room.host,
+            guest: room.guest,
+            create_time: room.create_time,
+            result: result,
+            winner: winner,
+            bet_point: room.bet_point
+        }
+        this.app.models.game.createGame(game);
     }
 
 
@@ -151,7 +175,6 @@ class Connection {
         let clientConnection;
         switch (header) {
             case 'authenticated':
-                console.log("authenticated");
                 clientConnection = this.listConnections.get(socketId);
                 clientConnection.userId = data;
                 clientConnection.isAuthenticated = true;

@@ -27,6 +27,7 @@ class Room {
                     'host_socket': socketId,
                     'bet_point': betPoint,
                     'is_played': 0,
+                    'prev_turn': 'null',
                     'create_time': createTime
                 });
                 const roomFormat = {
@@ -48,7 +49,7 @@ class Room {
                 'guest': guest,
                 'guest_id': guestId,
                 'guest_socket': socketId,
-                'prev_turn': 'null'
+                'prev_turn': 2
             });
             // get room to send all client
             client.hgetall('room:' + roomId, (err, object) => {
@@ -59,6 +60,12 @@ class Room {
                     resolve(object);
                 }
             });
+        });
+    }
+
+    updatePlay(roomId, value) {
+        client.hmset('room:' + roomId, {
+            'prev_turn': value
         });
     }
 
@@ -76,52 +83,42 @@ class Room {
         });
     }
 
-   getAllRoom() {
-        
-        const scanner = new redisScan(client);
-        let listRoom = new ArrayList;
-        let listRoomName = new ArrayList;
-
-        scanner.eachScan('room:*', (matchingKeys) => {
-            // Depending on the pattern being scanned for, many or most calls to
-            // this function will be passed an empty array.
-            if (matchingKeys.length) {
-                for(let i = 0; i < matchingKeys.length; i++) {
-                        // console.log(lodash.get(data, 'id'));
-
-                        console.log("get all room  "+matchingKeys[i])
-                        listRoomName.add(matchingKeys[i])
-   
-                        // var tmp = JSON.stringify(this.findRoomByRoomName(matchingKeys[i]))
-                        // console.log("room "+ tmp[10])
-                }
-            }
-        }, (err, matchCount) => {
-            if (err) throw(err);
-         
-            // matchCount will be an integer count of how many total keys
-            // were found and passed to the intermediate callback.
-
-   
-            
-            console.log(`Found ${matchCount} keys.`);
-            return listRoomName
-        });
-    }
-
     findRoomByRoomName(roomName) {
-        client.hgetall(roomName, function(err, rep){
-            if(err || !rep) {
-                const message = {
-                    error: 'room not found'
+        return new Promise((resolve, reject) => {
+            client.hgetall(roomName, function(err, rep){
+                if(err || !rep) {
+                    const message = {
+                        error: 'room not found'
+                    }
+                    reject(message); 
                 }
-                return ; 
-            }
-            console.log(rep);
-            return JSON.stringify(rep);
+                resolve(rep);
+            });
         });
     }
 
+    getAllRoomName() {
+        const scanner = new redisScan(client);
+        let listRoomName = new ArrayList;
+        return new Promise((resolve, reject) => {
+            scanner.scan('room:*', (err, matchingKeys) => {
+                if (err) reject(err);        
+                resolve(matchingKeys);
+            });
+        });
+    }
+
+    async getAllRoom() {
+        let listRoom = new ArrayList;
+        let listRoomName = await this.getAllRoomName();
+        for(let i = 0; i < listRoomName.length; i++) {
+            let room = await this.findRoomByRoomName(listRoomName[i]);
+            if(room.is_played === '0') {
+                listRoom.add(room);
+            }
+        }
+        return listRoom;
+    }
 }
 
 module.exports = Room;
