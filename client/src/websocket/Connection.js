@@ -83,7 +83,7 @@ export default class Connection {
 
         localStorage.setItem("gameUserInfor",JSON.stringify(gameUserInfor));
 
-        this.store.dispatch(indexAction.createGameUserInfor(data));
+        // this.store.dispatch(indexAction.createGameUserInfor(data));
     }
 
 

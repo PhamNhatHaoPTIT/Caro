@@ -8,6 +8,7 @@ class GameInfor extends Component{
 
     
     render(){
+        console.log("game user infor "+JSON.stringify(JSON.parse(localStorage.getItem('gameUserInfor'))))
         return(
             
         <Card  className="game-infor" >

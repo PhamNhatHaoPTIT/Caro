@@ -6,8 +6,12 @@ import InforUser from "./InforUser"
 import Rank from "./Rank"
 import {connect} from 'react-redux';
 import {Container,Col,Row } from 'react-bootstrap';
+import Api from '../../api/Api'
 
 class Dashboard extends Component{
+
+    
+
     render(){
         return(
             (
@@ -31,8 +35,30 @@ class Dashboard extends Component{
 
 }
 
+const api = new Api();
+
+function getUserInfor(){
+    return new Promise((resolve,reject) =>{
+        api.get('user/'+JSON.parse(localStorage.getItem('userInfor'))._id).then((response)=>{
+            console.log(response.data)
+            localStorage.setItem('userInfor',JSON.stringify(response.data.user))
+            localStorage.setItem('token',JSON.stringify(response.data.token))
+
+            this.props.addUserInfor(response.data.user);
+
+            if(response.status===200)
+                this.props.history.push({
+                pathname: '/',
+              })
+                
+        }).catch((err)=>{
+            console.log("login err",err);
+        })
+    });
+}
 
 function mapStateToProps(state){
+    // getUserInfor()
     var userInfor = JSON.parse(localStorage.getItem('userInfor'));
     
     return{

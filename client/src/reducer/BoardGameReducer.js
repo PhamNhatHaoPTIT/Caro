@@ -33,7 +33,8 @@ export default (state = [], action) => {
         default:
             state.board = new Array(100).fill('');
             state.isEndGame = false;
-            JSON.parse(localStorage.getItem('roomInfor')).host === JSON.parse(localStorage.getItem('userInfor')).username ?  state.canGo = true : state.canGo = false;
+           
+            state.canGo = true;
             return state;
     }
 

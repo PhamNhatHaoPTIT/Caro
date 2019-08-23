@@ -10,7 +10,6 @@ import BoardGame from './component/BoardGame/BoardGame'
 import {BrowserRouter as Router,Route,Switch,Redirect} from 'react-router-dom'
 import { createBrowserHistory } from "history";
 
-const { Header, Footer, Sider, Content } = Layout;
 
 export const history = createBrowserHistory();
 

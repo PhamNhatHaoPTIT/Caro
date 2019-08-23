@@ -132,15 +132,15 @@ class User {
             const db = this.app.db;
             let user = await this.findUserById(id);
             console.log("user: " + JSON.stringify(user));
-            let winGame = user.win_game;
-            let point = user.point;
-            let totalGame = user.total_game;
+            let winGame = parseInt(user.win_game);
+            let point = parseInt(user.point);
+            let totalGame = parseInt(user.total_game);
             totalGame++;
             if(result === 'win') {
                 winGame++;
-                point += room.bet_point;
+                point += parseInt(room.bet_point);
             } else if(result === 'lose') {
-                point -= room.bet_point;
+                point -= parseInt(room.bet_point);
             }
             var query = {username: user.username};
             var value = { $set: { total_game: totalGame, point: point, win_game: winGame } };
