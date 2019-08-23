@@ -15,7 +15,7 @@ class Board extends Component{
          board: this.props.board,
          gameEnded: false,
          host: JSON.parse(localStorage.getItem('roomInfor')).host,
-         value: '',
+         canGo: this.props.canGo,
       }
    }
 
@@ -174,28 +174,33 @@ class Board extends Component{
    }
 
    handleClick(event,index){
+    if(this.props.canGo)
+    {
+        if( this.props.board[index]==='')
+        { 
+        this.state.host === JSON.parse(localStorage.getItem('userInfor')).username ? this.state.value=1 : this.state.value=2 ; // 1 host
+        this.state.board[index] = this.state.value;
 
-      if(this.state.board[index]==='')
-      { 
-         this.state.host === JSON.parse(localStorage.getItem('userInfor')).username ? this.state.value=1 : this.state.value=2 ; // 1 host
-         this.state.board[index] = this.state.value;
-
-         const turnInfor = {
+        const turnInfor = {
             user_id: JSON.parse(localStorage.getItem('userInfor'))._id,
             room_id: JSON.parse(localStorage.getItem('roomInfor')).id === undefined? JSON.parse(localStorage.getItem('roomInfor')).room_id : JSON.parse(localStorage.getItem('roomInfor')).id,
             x: Math.floor(index/10),
             y: index%10,
             value: this.state.value,
-         }
+            canGo: false,
+            isEndGame: false,
+        }
 
-         this.props.playTurn(turnInfor);
-         this.checkWin(this.state.board,Math.floor(index/10),index%10,this.state.value)
+        this.props.playTurn(turnInfor);
+        this.checkWin(this.state.board,Math.floor(index/10),index%10,this.state.value)
 
-
-
-      }
-      else
-         alert("Cell not empty")
+        }
+        else
+            alert("Cell not empty")
+    }
+    else
+      
+       alert("Is not your turn");
    }
 
 
@@ -234,6 +239,7 @@ class Board extends Component{
 function mapStatetoProps(state){
    return{
      board: state.boardGame.board,
+     canGo: state.boardGame.canGo,
 
    }
 }

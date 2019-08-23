@@ -6,3 +6,4 @@ export const JOIN_ROOM = "JOIN_ROOM";
 export const PLAY_TURN = "PLAY_TURN";
 export const CREATE_MESSAGE = "CREATE_MESSAGE";
 export const CREATE_GAME_USER_INFOR = "CREATE_GAME_USER_INFOR";
+export const CREATE_RESULT_GAME = "CREATE_RESULT_GAME";

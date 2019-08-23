@@ -8,12 +8,11 @@ class GameInfor extends Component{
 
     
     render(){
-        console.log("user infor "+JSON.stringify(this.props.gameUserInfor))
         return(
             
         <Card  className="game-infor" >
             <Card.Header>
-                Your turn
+                {this.props.canGo===true? "Your turn" : "Wait to your turn"}
             </Card.Header>
             <Card.Body>
                 <Card className="bet-point">Bet point: {JSON.parse(localStorage.getItem('gameUserInfor')).bet_point} p</Card>
@@ -36,10 +35,9 @@ class GameInfor extends Component{
 }
 
 function mapStateToProps(state){
-    console.log("user infor 1"+JSON.stringify(state.gameUserInfor))
 
     return{
-        gameUserInfor: state.gameUserInfor,
+        canGo: state.boardGame.canGo,
     }
 }
 

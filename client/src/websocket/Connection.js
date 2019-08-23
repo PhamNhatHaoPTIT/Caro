@@ -1,7 +1,7 @@
 import lodash from 'lodash';
 import Store from '../store/Store'
 import * as indexAction from '../action/index'
- 
+import * as helper from '../helper/Helper'
 
 export default class Connection {
 
@@ -71,28 +71,27 @@ export default class Connection {
     }
 
     handleJoinRoom(data){
-        console.log("abc join room "+JSON.stringify(data));
+        console.log("join room "+JSON.stringify(data));
 
         const gameUserInfor ={
             host: data.host,
             guest: data.guest,
             bet_point: data.bet_point,
             room_id: data.id,
+            value: 1,
         }
 
         localStorage.setItem("gameUserInfor",JSON.stringify(gameUserInfor));
 
         this.store.dispatch(indexAction.createGameUserInfor(data));
-        // localStorage.setItem("roomUserInfor",JSON.stringify(data))
-
-        // if(data.host !== JSON.parse(localStorage.getItem('userInfor')).username)
-        //     this.store.dispatch()
     }
 
 
 
     handlePlayGame(data){
         console.log("receive play "+JSON.stringify(data));
+
+        data["canGo"] =true;
         this.store.dispatch(indexAction.playTurn(data));
     }
 
@@ -103,7 +102,10 @@ export default class Connection {
 
     handleResultGame(data){
         console.log("result game "+JSON.stringify(data));
-        
+        alert("You lose");
+        this.store.dispatch(indexAction.createResultGame(data))
+
+
     }
 
     handleMessage(message){

@@ -49,6 +49,13 @@ export const playTurn = (turnInfor) =>{
     }
 }
 
+export const createResultGame = (resultGame) =>{
+    return{
+        type: actionTypes.CREATE_RESULT_GAME,
+        boardGame: resultGame,
+    }
+}
+
 
 export const createMessage = (chatMessageInfor) =>{
     console.log("chat message "+JSON.stringify(chatMessageInfor))  
