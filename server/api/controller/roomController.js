@@ -1,5 +1,5 @@
 const lodash = require('lodash');
-const helper  =require('../../helper/Helper.js');
+
 const create = (req, res) => {
     const body = req.body;
     req.app.models.room.createRoom(body).then((data) => {
@@ -21,10 +21,9 @@ const update = (req, res) => {
 }
 
 
-const demo =  async (req, res) => {
-    let data = await req.app.models.room.findRoomById(4);
-    console.log("here")
+const getRoom = async (req, res) => {
+    let data = await req.app.models.room.getAllRoom();
     return res.status(200).json(data);
 }
 
-module.exports = { update, create, demo };
+module.exports = { update, create, getRoom };

@@ -15,35 +15,24 @@ class User {
 
         let check = true;
 
-        if (!helper.isUserNameAndPassword(username) || username.length < 1 || username.length > 20) {
-            check = false;
-        }
+        if (!helper.isUserNameAndPassword(username) || username.length < 1 || username.length > 20) check = false;
 
-        if (!helper.isUserNameAndPassword(password) || password.length < 1 || password.length > 20) {
-            check = false;
-        }
+        if (!helper.isUserNameAndPassword(password) || password.length < 1 || password.length > 20) check = false;
 
         if (!check) {
             const err = "Invalid value";
-            return callback({
-                error_message: err,
-                message: err
-            }, null);
+            return callback({err: err}, null);
         }
 
-        // check username is exist in db
         this.app.db.collection('users').findOne({"username": username}, (err, result) => {
             if (err || result) {
                 const err = "Username is already exist";
-                return callback({
-                    error_message: err,
-                    message: err
-                }, null);
+                return callback({err: err}, null);
             }
-            const hashPassword = bcrypt.hashSync(password, 10);
+            const hashedPassword = bcrypt.hashSync(password, 10);
             const userFormat = {
                 username: username,
-                password: hashPassword,
+                password: hashedPassword,
                 win_game: 0,
                 total_game: 0,
                 point: 100
@@ -57,28 +46,21 @@ class User {
         return new Promise((resolve, reject) => {
             this.checkUser(user, (err, user) => {
                 if (err) {
-                    return reject(err);
+                    reject(err);
                 }
                 db.collection('users').insertOne(user, (err, info) => {
                     if (err) {
-                        return reject({
-                            error_message: "Do not save user.",
-                            message: "Do not save user."
-                        });
+                        reject({error: "Do not save user."});
                     }
-                    
                     // create token
-                    token.createToken(lodash.get(user, 'username')).then((tokenObj) => {
+                    token.createToken(lodash.get(user, 'username')).then((token) => {
                         let data = {};
                         lodash.unset(user, 'password');
-                        data.token = tokenObj;
+                        data.token = token;
                         data.user = user;
-                        return resolve(data);
+                        resolve(data);
                     }).catch((err) => {
-                        return reject({
-                            error_message: "Login failed",
-                            message: "Login failed"
-                        })
+                        reject({err: err});
                     })
                 });
             });
@@ -89,13 +71,10 @@ class User {
         this.app.db.collection('users').findOne({username: username}, (err, result) => {
             if (err || !result) {
                 const err = "User not found";
-                return callback({
-                    error_message: err,
-                    message: err
-                }, null);
+                return callback({err: err}, null);
             }
             return callback(null, result);
-        })
+        });
     }
 
 
@@ -105,64 +84,74 @@ class User {
         return new Promise((resolve, reject) => {
             if (!username || !password || !helper.isUserNameAndPassword(username) || !helper.isUserNameAndPassword(password)) {
                 const err = "Invalid value";
-                return reject({
-                    error_message: err,
-                    message: err
-                });
+                reject({err: err});
             }
 
             this.findUserByUsername(username, (err, result) => {
                 if (err) {
-                    return reject({
-                        error_message: "Login failed",
-                        message: "Login failed"
-                    });
+                    reject({err: "Login failed"});
                 }
-                const hashPassword = lodash.get(result, 'password');
-                const check = bcrypt.compareSync(password, hashPassword);
+                const hashedPassword = lodash.get(result, 'password');
+                const check = bcrypt.compareSync(password, hashedPassword);
                 if (!check) {
-                    return reject({
-                        error_message: "Login failed",
-                        message: "Login failed"
-                    });
+                    reject({err: "Login failed"});
                 }
                 // create token
-                token.createToken(lodash.get(result, 'username')).then((tokenObj) => {
+                token.createToken(lodash.get(result, 'username')).then((token) => {
                     let data = {};
                     lodash.unset(result, 'password');
-                    data.token = tokenObj;
+                    data.token = token;
                     data.user = result;
-                    return resolve(data);
+                    resolve(data);
                 }).catch((err) => {
-                    return reject({
-                        error_message: "Login failed",
-                        message: "Login failed"
-                    })
+                    reject({err: err});
                 })
             });
         })
     }
 
-    logout(userId){
+    findUserById(id) {
         return new Promise((resolve, reject) => {
-            return resolve("Logout success");
-        })
+            if (!id) {
+                const err = "User not found";
+                reject({err: err});
+            }
+            const userId = new ObjectId(id);
+            this.app.db.collection('users').findOne({_id: userId}, (err, result) => {
+                if (err || !result) {
+                    const err = "User not found";
+                    reject({err: err});
+                }
+                resolve(result);
+            });
+        });
     }
 
-
-     async  findUserById(id){
-        try{
-            const userId = new ObjectId(id);
-            let user = await this.app.db.collection('users').findOne({_id:userId});
-            console.log("find user by id: " + id + " userId: " + userId + "\t"+JSON.stringify(user) );
-            return user;
-
-        }catch(e){
-
-            const err = "User not found";
-            console.log("find user "+err);
-
-        }
+    updateUser(id, result, room) {
+        return new Promise( async (resolve, reject) => {
+            const db = this.app.db;
+            let user = await this.findUserById(id);
+            console.log("user: " + JSON.stringify(user));
+            let winGame = user.win_game;
+            let point = user.point;
+            let totalGame = user.total_game;
+            totalGame++;
+            if(result === 'win') {
+                winGame++;
+                point += room.bet_point;
+            } else if(result === 'lose') {
+                point -= room.bet_point;
+            }
+            var query = {username: user.username};
+            var value = { $set: { total_game: totalGame, point: point, win_game: winGame } };
+            db.collection("users").updateOne(query, value, function(err, res){
+                console.log("in callback");
+                if(err) {
+                    reject({err: 'update user failed'});
+                }
+                resolve({message: 'updated user'});
+            });
+        });
     }
 
 }

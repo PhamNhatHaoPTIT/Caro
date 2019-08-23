@@ -32,7 +32,9 @@ database.connect().then((db) => {
 // routes
 userRoute.login(app);
 userRoute.register(app);
+userRoute.user(app);
 roomRoute.rooms(app);
+roomRoute.allroom(app);
 
 app.server.listen(process.env.PORT || 3001, () => {
     console.log(`App running on port: ${app.server.address().port}`);
