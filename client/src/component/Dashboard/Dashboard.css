@@ -1,0 +1,159 @@
+.card-header h3{
+    font-family: Roboto,sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    line-height: 50px;
+    font-size: 35px; 
+    float: left;
+    color: #7692C6;
+}
+
+
+
+.card-header button{
+    float: right;
+    font-family: Roboto,sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 18px;
+    margin-top:10px; 
+    width: 130px;
+    height: 40px;
+    text-align: center;
+    border: none;
+    background: #E98885;
+    color: white;
+}
+
+.card-header button:hover{
+    background: #7692C6;
+    color: white;
+}
+
+.ant-layout-content{
+    height: 800px;
+    background: none;
+    width: auto;
+}
+
+
+.card-room-item{
+    height: 110px;
+    width: auto;
+    min-width: 568px;
+}
+
+.card-room-list{
+    min-width: 568px;
+}
+
+.card-room-item img{
+    background-image: url("../../media/door.png");
+    background-size: 65px 65px;
+    float: left;
+    width: 70px; 
+    height:70px;
+    border: 3px solid #E98885;
+    border-radius: 50%; 
+    margin-top: 8px; 
+}
+
+.card-room-item button{
+    float: right;
+    font-family: Roboto,sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 18px;
+    margin-top:20px; 
+    width: 90px;
+    height: 40px;
+    text-align: center;
+    border: none;
+    background: #7692C6;
+    color: white;
+}
+
+.card-room-item button:hover{
+    background: rgb(154, 179, 226);
+}
+
+
+
+.card-room-item .card-title{
+    margin-top:10px; 
+    font-size: 24px;
+    color:#7692C6;
+}
+
+.card-room-item .card-title span{
+    color: rgb(218, 79, 74);
+}
+
+.infor-user{
+    min-width: 338px;
+}
+
+.infor-user img{
+    background-image: url("../../media/youngjae.jpg");
+    background-size: 65px 65px;
+    width: 65px;
+    height: 65px;
+    border: 3px solid #7692C6;
+    border-radius: 50%; 
+    margin-top: 8px; 
+}
+
+.infor-user p{
+    font-size: 24px;
+    font-family: Roboto,sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    color: #7692C6;
+}
+
+.card-body .col{
+    font-size: 14px;
+}
+
+.ranking .card-header{
+    font-size: 24px;
+    color: white ;
+    background-color:rgb(218, 110, 107);
+}
+
+
+.rank-item img{
+    background-image: url("../../media/youngjae.jpg");
+    background-size: 45px 45px;
+    width: 45px;
+    height: 45px;
+    border: 3px solid #7692C6;
+    border-radius: 50%; 
+    margin: 5px;
+}
+
+.rank-item{
+    justify-content: 'center';
+    margin: 5px 0px 5px 0px;
+}
+
+.ranking{
+    min-width: 338px;
+}
+
+.rank-item .card{
+    min-width:  320px;
+    height: 60px;
+}
+
+.rank-item  .card-title{
+    color: rgb(218, 79, 74);
+    margin:5px 0px 5px 0px;     
+}
+
+
+
+.roomList{
+    max-height: calc(100vh - 210px);
+    overflow-y: auto;
+}

@@ -1,0 +1,45 @@
+.header-logo h1{
+    float: left;
+    font-family: Roboto,sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    line-height: 60px;
+    margin-left: 10px;
+    font-size: 30px;
+    color: rgb(218, 110, 107);
+
+}
+
+
+.header-logo img{
+    float: left;
+    background-image: url("../../media/tree.png");
+    background-size: 47px 47px;
+    width: 55px; 
+    height:55px;
+    border: 3px solid #F7CAC9;
+    border-radius: 50%;
+}
+
+
+.header-logo button{
+    color: rgb(218, 110, 107);
+    line-height: 60px;
+    float: right;
+    background: none;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.header-logo button:hover{
+    color: #7692C6;;
+
+}
+
+
+.ant-layout-header
+{
+  background:white;
+  border: 	#ffecec 1px solid;
+}

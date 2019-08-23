@@ -1,0 +1,29 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "arraylist": "^0.1.0",
+    "bcrypt": "^3.0.6",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "github-username-regex": "^1.0.0",
+    "immutable": "^4.0.0-rc.12",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
+    "mongodb": "^3.3.0",
+    "node-matrix": "^1.0.0",
+    "node-redis-scan": "^1.0.3",
+    "nodemon": "^1.19.1",
+    "redis": "^2.8.0",
+    "ws": "^7.1.2"
+  }
+}
