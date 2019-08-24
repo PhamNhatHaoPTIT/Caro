@@ -276,8 +276,16 @@ class Connection {
                 if(!connection){
                     return;
                 }
+
                 await this.app.models.room.findRoomById(connection.room_id).then( async (room) => {
                     console.log('in room: ' + JSON.stringify(room));
+                    const message = {
+                        header: 'game_result',
+                        data:
+                        {
+                            result: 'win'
+                        }
+                    }
                     if(lodash.get(room, 'host_socket') === socketId) {
                         const data = {
                             room_id: connection.room_id,
@@ -285,13 +293,15 @@ class Connection {
                             result: 'lose'
                         }
                         await this.handelGameResult(data);
+                        this.sendMessage((this.listConnections.get(room.guest_socket)).ws, message);
                     } else {
                         const data = {
                             room_id: connection.room_id,
                             sender: room.host,
                             result: 'lose'
                         }
-                        this.handelGameResult(data);
+                        await this.handelGameResult(data);
+                        this.sendMessage((this.listConnections.get(room.host_socket)).ws, message);
                     }
                 }).catch((err) => {
 
