@@ -3,7 +3,6 @@ const { ObjectId } = require('mongodb');
 const lodash = require('lodash');
 const token = require('../models/Token.js');
 
-
 class Connection {
 
     constructor(app) {
@@ -127,6 +126,35 @@ class Connection {
         });
     }
 
+    async saveCache(listTop) {
+        for(let i = 0; i < listTop.length; i++) {
+            await this.app.models.user.savePlayerInRedis(listTop[i].point, listTop[i].username);
+        }
+    }
+
+    async handleTopPlayer(host, guest) {
+        let checkRoom = await this.app.models.user.checkListTopPlayer();
+        let listTop;
+        if(checkRoom == 0) {
+            listTop = await this.app.models.user.getTop();              // get top 5 player in mongo db
+            await this.saveCache(listTop);
+        } else {
+            listTop = await this.app.models.user.getListTopPlayer();             // get list top in redis
+        }
+        for(let i = listTop.length - 1 ; i >= 0; i--) {
+            if(host == lodash.get(listTop[i], 'username') || guest == lodash.get(listTop[i], 'username')) {
+                await this.app.models.user.deleteCache(); 
+                listTop = await this.app.models.user.getTop();              // get top 5 player in mongo db
+                await this.saveCache(listTop);
+                const message = {
+                    header: 'rank',
+                    data: listTop
+                }
+                this.sendAllUserOnline(message);
+            }
+        }
+    }
+
     async handelGameResult(data) {
         const roomId = lodash.get(data,'room_id');
         const sender = lodash.get(data,'sender');
@@ -147,6 +175,7 @@ class Connection {
                 winner = sender;
                 await this.app.models.user.updateUser(room.host_id, 'win', room);
                 await this.app.models.user.updateUser(room.guest_id, 'lose', room);
+                await this.handleTopPlayer(room.host, room.guest);            // check and update list top player for winner
             } else {
                 await this.app.models.user.updateUser(room.host_id, 'draw', room);
                 await this.app.models.user.updateUser(room.guest_id, 'draw', room);
@@ -157,12 +186,14 @@ class Connection {
                 winner = sender;
                 await this.app.models.user.updateUser(room.host_id, 'lose', room);
                 await this.app.models.user.updateUser(room.guest_id, 'win', room);
+                await this.handleTopPlayer(room.host, room.guest);            // check and update list top player for winner
             } else {
                 await this.app.models.user.updateUser(room.host_id, 'draw', room);
                 await this.app.models.user.updateUser(room.guest_id, 'draw', room);
             }
             this.sendMessage((this.listConnections.get(room.host_socket)).ws,message);
         }
+
         const game = {
             host: room.host,
             guest: room.guest,

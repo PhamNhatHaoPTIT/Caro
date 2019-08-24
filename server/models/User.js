@@ -3,6 +3,9 @@ const helper = require('../helper/Helper.js');
 const bcrypt = require('bcrypt');
 const { ObjectId } = require('mongodb');
 const token = require('../models/Token.js');
+const redis = require('redis');
+const client = redis.createClient();
+const ArrayList = require('arraylist');
 
 class User {
     constructor(app) {
@@ -77,6 +80,16 @@ class User {
         });
     }
 
+    findUser(username) {
+        return new Promise((resolve, reject) => {
+            this.app.db.collection('users').findOne({username: username}, (err, result) => {
+                if (err || !result) {
+                    reject(err);
+                }
+                resolve(result);
+            });
+        });
+    }
 
     login(user) {
         const username = lodash.get(user, 'username');
@@ -148,6 +161,77 @@ class User {
                     reject({err: 'update user failed'});
                 }
                 resolve({message: 'updated user'});
+            });
+        });
+    }
+
+    // mongo db
+    getTop() {
+        const db = this.app.db;
+        let data = new ArrayList;
+        return new Promise((resolve, reject) => {
+            db.collection('users').find().sort({point: -1, username: 1}).limit(5).toArray(function(err, result) {
+                if (err) reject(err);
+                for(let i = 0; i < result.length; i++) {
+                    let rankInfo = {
+                        username: result[i].username,
+                        point: result[i].point
+                    }
+                    data.add(rankInfo);
+                }
+                resolve(data);
+            });
+        });
+    }
+
+    // redis cache
+    checkListTopPlayer() {
+        return new Promise((resolve, reject) => {
+            client.exists('top', function(err, reply) {
+                if(err) reject(err);
+                resolve(reply);
+            });
+        });
+    }
+
+    getListTopPlayer() {
+        let data = new ArrayList;
+        return new Promise((resolve, reject) => {
+            client.zrevrange('top', 0, -1, 'withscores', function(err, reply) {
+                if(err) reject(err);
+                for(let i = 0; i < reply.length; i++) {
+                    let rankInfo = {
+                        username: reply[i],
+                        point: reply[i + 1]
+                    }
+                    i++;
+                    data.add(rankInfo);
+                }
+                resolve(data);
+            })
+        })
+    }
+
+    savePlayerInRedis(point, username) {
+        return new Promise((resolve, reject) => {
+            client.zadd('top', 'NX', point, username, function(err, reply) {
+                if(err) reject(err);
+                resolve(reply);
+            });
+        });
+    }
+
+    saveListTopPlayer(listTopPlayer) {
+        for(let i = 0; i < listTopPlayer.length; i++) {
+            this.savePlayerInRedis(listTopPlayer[i].point, listTopPlayer[i].username);
+        }
+    }
+
+    deleteCache() {
+        return new Promise((resolve, reject) => {
+            client.del('top', function(err, reply) {
+                if(err) reject(err);
+                resolve(reply);
             });
         });
     }

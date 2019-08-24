@@ -20,8 +20,19 @@ const userRegister = (req, res) => {
 
 const getUser = async (req, res) => {
     const userId = req.params.id;
-    const user = await req.app.models.user.findUserById(userId)
+    const user = await req.app.models.user.findUserById(userId);
     return res.status(200).json(user);
 }
 
-module.exports = { userLogin, userRegister, getUser };
+const getTopUser = async (req, res) => {
+    const data = await req.app.models.user.getTop();
+    return res.status(200).json(data);
+}
+
+const demo = async (req, res) => {
+    let data = await req.app.models.user.deleteUserInRedis('save');
+    console.log(data);
+    return res.status(200).json('data');
+}
+
+module.exports = { userLogin, userRegister, getUser, getTopUser, demo };
