@@ -31,7 +31,8 @@ export default class Connection {
     }
 
     sendAuthentication(){
-        this.sendMessage("authenticated",JSON.parse(localStorage.getItem('token')))
+        this.sendMessage("authenticated",{token:JSON.parse(localStorage.getItem('token'))})
+        if(JSON.parse(localStorage.getItem('userInfor')) !== null)
         this.username = JSON.parse(localStorage.getItem('userInfor')).username;
     }
 
@@ -45,14 +46,17 @@ export default class Connection {
     }
 
     sendPlayGame(turnInfor){
+        turnInfor.token = JSON.parse(localStorage.getItem('token'));
         this.sendMessage("play_game",turnInfor);
     }
 
     sendChatMessage(chatMess){
+        chatMess.token = JSON.parse(localStorage.getItem('token'));
         this.sendMessage("chat",chatMess);
     }
 
     sendResultGame(result){
+        result.token = JSON.parse(localStorage.getItem('token'));
         this.sendMessage("game_result",result);
     }
 

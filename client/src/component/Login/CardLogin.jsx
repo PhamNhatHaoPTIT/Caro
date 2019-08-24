@@ -61,7 +61,7 @@ class CardLogin extends Component{
                 <Form onSubmit={this.handleSubmit} className="login-form">
                     
                     <Form.Item>
-                        Or <a href="">Create an account!</a>
+                        Or <a href="/signup">Create an account!</a>
                     </Form.Item>
                     
                     <Form.Item>
@@ -85,11 +85,7 @@ class CardLogin extends Component{
                         />,
                     )}
                     </Form.Item>
-                    <Form.Item>
-                    <a className="login-form-forgot" href="">
-                        Forgot password
-                    </a>
-                    </Form.Item>
+                    
                     <Form.Item>
 
                     <Button type="primary" htmlType="submit" className="login-form-button">

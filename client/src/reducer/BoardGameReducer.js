@@ -19,19 +19,25 @@ export default (state = [], action) => {
     switch(action.type){
             
         case actionTypes.PLAY_TURN:
-            console.log("value turn "+action.boardGame.canGo)
-            var newMatrix = state.board.map( e=>e);
-            newMatrix[action.boardGame.x*10+action.boardGame.y] = action.boardGame.value;
-            state.board = newMatrix;
-            state.canGo = action.boardGame.canGo;
-            return state;
+            console.log("value turn "+action.boardGame.canGo+" "+state.board)
+            var newState = {...state};
 
+            newState.board = state.board.map( e=>e);
+            newState.board[action.boardGame.x*10+action.boardGame.y] = action.boardGame.value;
+            // state.board = newMatrix;
+            newState.canGo = action.boardGame.canGo;
+
+            console.log("new board "+newState.board)
+            return newState;
         case actionTypes.CREATE_RESULT_GAME:
             console.log("result game "+ JSON.stringify (action.boardGame))
 
-            state.result = "You "+ action.boardGame.result;
-            state.visible = true;
-            return state;    
+            var newState = {...state};
+            
+
+            newState.result = "You "+ action.boardGame.result;
+            newState.visible = true;
+            return newState;    
          
         default:
             console.log("default board game");

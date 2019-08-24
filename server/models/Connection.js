@@ -262,12 +262,31 @@ class Connection {
             };
             this.listConnections = this.listConnections.set(socketId, clientConnection);
 
-            ws.on('message', (msg) => {
+            ws.on('message', async (msg) => {
                 const messageClient = this.decodeMessage(msg);
                 console.log("client send message: ", msg);
-                const header = lodash.get(messageClient, 'header');
-                const data = lodash.get(messageClient, 'data');
-                this.handelMessage(socketId, header, data);
+
+                let tokenObj = lodash.get(messageClient, 'token');
+                if(tokenObj === undefined) {
+                    const data = lodash.get(messageClient, 'data');
+                    tokenObj = data.token;
+                }
+                //verify token
+                await token.verifyToken(tokenObj).then((result) => {
+                    const header = lodash.get(messageClient, 'header');
+                    const data = lodash.get(messageClient, 'data');
+                    this.handelMessage(socketId, header, data);
+                }).catch((err) => {
+                    console.log('unauthentican');
+                    const connection = this.listConnections.get(socketId);
+                    if (connection) {
+                        let message = {
+                            header: "unauthenticated",
+                            data: "403",
+                        }
+                        this.sendMessage(connection.ws, message);
+                    }
+                })
             })
 
             ws.on('close', async () => {

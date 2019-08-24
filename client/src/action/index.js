@@ -2,11 +2,11 @@ import * as actionTypes from './ActionType';
 import axios from 'axios'
 import Connection from '../websocket/Connection'
 
-var connection= '';
+var  connection = new Connection();
 
 
 export const createSocket = () =>{
-    connection = new Connection();
+   
     connection.sendAuthentication();
 }
 
@@ -95,5 +95,11 @@ export const createRankUser = (rankItems) =>{
     }
 }
 
+
+export const refreshRankuser = ()=>{
+    return{
+        type: actionTypes.REFRESH_RANK_USER,
+    }
+}
 
 

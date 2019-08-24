@@ -10,7 +10,8 @@ import * as helper from '../../helper/Helper'
 import Api from '../../api/Api'
 import Axios from "axios";
 import * as indexAction from '../../action/index'
-
+import { Layout } from "antd";
+import HeaderBar from '../HeaderBar/HeaderBar'
 
 
 class Dashboard extends Component{
@@ -42,6 +43,8 @@ class Dashboard extends Component{
         // get rank
         api.get('user',
         ).then(response=>{
+            console.log("get rank "+ response.data)
+            this.props.refreshRankuser();
             response.data.map(rank => this.props.createRankUser(rank))
 
         }).catch(err =>{
@@ -54,6 +57,11 @@ class Dashboard extends Component{
     render(){
         return(
             (
+            <main>
+                <Layout>
+                    <HeaderBar></HeaderBar>
+                </Layout>
+                <br></br>
                 <Container>
                 <Row>
                     <Col  xl={8} lg={12} md={12} sm={12} >
@@ -66,6 +74,7 @@ class Dashboard extends Component{
                     </Col>
                 </Row>
                 </Container>
+            </main>
 
             )
         );
@@ -90,7 +99,8 @@ function mapStateToProps(state){
 
 const mapDispatchToProps = (dispatch) =>{
     return{
-        createRankUser: rankItems => dispatch(indexAction.createRankUser(rankItems))
+        createRankUser: rankItems => dispatch(indexAction.createRankUser(rankItems)),
+        refreshRankuser: refreshRankuser => dispatch(indexAction.refreshRankuser())
     }
  }
 

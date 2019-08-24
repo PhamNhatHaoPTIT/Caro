@@ -53,10 +53,7 @@ class App extends Component {
     return (
       <Router history={history} >
         <main className="App">
-              <Layout>
-                <HeaderBar></HeaderBar>
-              </Layout>
-              <br></br>
+
   
   
           <Switch>
