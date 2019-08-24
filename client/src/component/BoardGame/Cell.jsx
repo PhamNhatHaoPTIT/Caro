@@ -1,6 +1,5 @@
 import React from 'react';
-import sakura from '../../media/flower.png';
-import leaf from '../../media/leaf.jpg';
+
 
 export default class Cell extends React.Component {
   constructor(props){

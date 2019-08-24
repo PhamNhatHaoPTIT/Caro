@@ -118,7 +118,13 @@
 .ranking .card-header{
     font-size: 24px;
     color: white ;
-    background-color:rgb(218, 110, 107);
+    font-weight: bold;
+    border: none;
+    background-image: -webkit-linear-gradient(left, #ff8177 0%, #ff867a 0%, #ff8c7f 21%, #f99185 52%, #cf556c 78%,
+    #b12a5b 100%);
+    background-image: linear-gradient(to right, #ff8177 0%, #ff867a 0%, #ff8c7f 21%, #f99185 52%, #cf556c 78%,
+    #b12a5b 100%); 
+     
 }
 
 

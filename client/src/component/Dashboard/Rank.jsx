@@ -10,9 +10,9 @@ class Rank extends Component{
 
     createRankItemList(){
         let listItem = this.props.rankItems.map(
-            (eachRankItem) =>{
+            (eachRankItem,index) =>{
                 return(
-                    <RankItem username={eachRankItem.username} point={eachRankItem.point} avatar={eachRankItem.avatar}></RankItem>
+                    <RankItem key={index} username={eachRankItem.username} point={eachRankItem.point} avatar={eachRankItem.avatar}></RankItem>
                 );
             }
         );

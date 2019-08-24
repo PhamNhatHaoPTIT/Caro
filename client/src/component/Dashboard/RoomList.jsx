@@ -26,6 +26,21 @@ class RoomList extends Component{
         confirmLoading: false,
 
     };
+
+    componentDidMount(){
+        const api = new Api();
+
+        api.get('allroom').then(response=>{
+            this.setState({userInfor:response.data})
+            for(var i=0;i<response.data.length; i++){
+                this.props.createListRoom(response.data[i]);
+            }
+
+        }).catch(err =>{
+            console.log("get user infor err "+ err);
+
+        })
+    }
     
     onChange = value => {
         this.setState({
@@ -55,9 +70,6 @@ class RoomList extends Component{
                 bet_point: this.state.inputValue,
                 
             }
-            // this.props.createNewRoom(roomInfor);
-            // localStorage.setItem("roomInfor",JSON.stringify(roomInfor))
-            
 
             this.state.point-=this.state.inputValue;
             helper.addToLocalStorageObject("userInfor","point",this.state.point);
@@ -82,8 +94,6 @@ class RoomList extends Component{
             this.setState({
                 ModalText: 'Your point is not enough',
               });
-    
-            console.log("input "+this.state.inputValue)
         }  
 
 
@@ -91,12 +101,12 @@ class RoomList extends Component{
       };
 
     handleCancel = () => {
-        console.log("Clicked cancel button");
         this.setState({
           visible: false
         });
       };
     
+
   
     createRoomItemList(){
         if(typeof this.props.roomItems !=="undefined"){
@@ -117,7 +127,7 @@ class RoomList extends Component{
 
     render(){
         const {inputValue, visible, ModalText, confirmLoading } = this.state;
-        
+
         return(
             
         <Card className="card-room-list" >
@@ -179,7 +189,8 @@ function mapStateToProps(state){
 
 const mapDispatchToProps = (dispatch) =>{
     return{
-        createNewRoom: roomInfor => dispatch(indexAction.createNewRoom(roomInfor))
+        createNewRoom: roomInfor => dispatch(indexAction.createNewRoom(roomInfor)),
+        createListRoom: roomInfor => dispatch(indexAction.createListRoom(roomInfor)),
     }
 }
 

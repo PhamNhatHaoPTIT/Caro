@@ -27,13 +27,18 @@ export default (state = [], action) => {
             return state;
 
         case actionTypes.CREATE_RESULT_GAME:
-            state.isEndGame = true;
+            console.log("result game "+ JSON.stringify (action.boardGame))
+
+            state.result = "You "+ action.boardGame.result;
+            state.visible = true;
             return state;    
          
         default:
+            console.log("default board game");
+
             state.board = new Array(100).fill('');
-            state.isEndGame = false;
-           
+            state.result = "Draw";
+            state.visible = false
             state.canGo = true;
             return state;
     }

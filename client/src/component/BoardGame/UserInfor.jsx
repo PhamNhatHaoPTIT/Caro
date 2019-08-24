@@ -15,17 +15,17 @@ export default class UserInfor extends Component{
     }
     
     render(){
-
+        
         return(
             
         <Card  className="user-infor" >
                 <Row>
                     <Col lg="12" sm="12" > 
-                        <img class="avatar-user"></img>
+                        <img class="avatar-user" alt=''></img>
                     </Col>
                     <Col lg="12" sm="12"  >
-                        <Card.Title>{this.state.username}</Card.Title>
-                             <img class="icon-user" src={this.state.src}></img>
+                        <Card.Title>{this.props.username}</Card.Title>
+                             <img  alt='' class="icon-user" src={this.state.src}></img>
                     </Col>
                 </Row>
         </Card>

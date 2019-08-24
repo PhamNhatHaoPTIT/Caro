@@ -23,12 +23,15 @@ class CardLogin extends Component{
                 localStorage.setItem('userInfor',JSON.stringify(response.data.user))
                 localStorage.setItem('token',JSON.stringify(response.data.token))
 
-                this.props.addUserInfor(response.data.user);
+                // this.props.addUserInfor(response.data.user);
 
-                if(response.status===200)
+                if(response.status===200){
                     this.props.history.push({
-                    pathname: '/',
-                  })
+                        pathname: '/',
+                      })
+                      indexAction.createSocket();
+                }
+
                     
             }).catch((err)=>{
                 console.log("login err",err);

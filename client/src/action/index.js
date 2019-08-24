@@ -4,8 +4,12 @@ import Connection from '../websocket/Connection'
 
 const connection = new Connection();
 
-export const addUserInfor = (user) =>{
+
+export const createSocket = () =>{
     connection.sendAuthentication();
+}
+
+export const addUserInfor = (user) =>{
     return{
         type: actionTypes.ADD_USER_INFOR,
         user: user
@@ -15,10 +19,26 @@ export const addUserInfor = (user) =>{
 
 export const createNewRoom = (roomInfor) =>{
     if(roomInfor.host === JSON.parse(localStorage.getItem('userInfor')).username)
-        connection.sendCreateRoom(roomInfor);
+     {   connection.sendCreateRoom(roomInfor);
+     }
     return{
         type: actionTypes.CREATE_NEW_ROOM,
         roomInfor: roomInfor
+    }
+}
+
+export const createListRoom = (roomInfor) =>{
+    return{
+        type: actionTypes.CREATE_LIST_ROOM,
+        roomInfor: roomInfor
+    }
+}
+
+export const deleteRoom = (roomInfor) =>{
+    console.log("room infor "+JSON.stringify(roomInfor))
+    return{
+        type: actionTypes.DELETE_ROOM,
+        roomInfor: roomInfor,
     }
 }
 

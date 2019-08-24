@@ -9,6 +9,7 @@ export default class Connection {
         this.store = Store;
         this.ws = null;
         this.isConnection = false;
+        this.username ='';
         this.connectServer();
     }
 
@@ -31,39 +32,32 @@ export default class Connection {
 
     sendAuthentication(){
         this.sendMessage("authenticated",JSON.parse(localStorage.getItem('token')))
+        this.username = JSON.parse(localStorage.getItem('userInfor')).username;
     }
 
     sendCreateRoom(roomInfor){
-        console.log("room create ")
         this.sendMessage("create_room",roomInfor);
     }
 
     sendJoinRoom(roomInfor){
         localStorage.setItem('roomInfor',JSON.stringify(roomInfor))
-        console.log("room infor",JSON.stringify(roomInfor));
-
         this.sendMessage("join_room",roomInfor);
     }
 
     sendPlayGame(turnInfor){
-        console.log("send turn infor "+JSON.stringify(turnInfor));
         this.sendMessage("play_game",turnInfor);
     }
 
     sendChatMessage(chatMess){
-        console.log("create message "+JSON.stringify(chatMess));
-
         this.sendMessage("chat",chatMess);
     }
 
     sendResultGame(result){
-        console.log("game result "+JSON.stringify(result));
         this.sendMessage("game_result",result);
     }
 
 
     handleCreateRoom(data){
-        console.log("create room "+JSON.stringify(data));
         localStorage.setItem("roomInfor",JSON.stringify(data))
         if(data.host !== JSON.parse(localStorage.getItem('userInfor')).username)
             this.store.dispatch(indexAction.createNewRoom(data));
@@ -71,39 +65,48 @@ export default class Connection {
     }
 
     handleJoinRoom(data){
-        console.log("join room "+JSON.stringify(data));
+        this.store.dispatch(indexAction.deleteRoom({id: data.id,host: data.host}));
 
-        const gameUserInfor ={
-            host: data.host,
-            guest: data.guest,
-            bet_point: data.bet_point,
-            room_id: data.id,
-            value: 1,
+        if(data.host ===  this.username || data.guest === this.username)    
+        {
+            
+            const gameUserInfor ={
+                host: data.host,
+                guest: data.guest,
+                bet_point: data.bet_point,
+                room_id: data.id,
+                value: 1,
+            }
+    
+            
+            if(data.host === this.username){
+                alert(data.guest+" is join");
+            }
+            this.store.dispatch(indexAction.createGameUserInfor(gameUserInfor));
+            localStorage.setItem("gameUserInfor",JSON.stringify(gameUserInfor));
+
+
         }
 
-        localStorage.setItem("gameUserInfor",JSON.stringify(gameUserInfor));
-
-        // this.store.dispatch(indexAction.createGameUserInfor(data));
+        
     }
 
 
 
     handlePlayGame(data){
-        console.log("receive play "+JSON.stringify(data));
-
         data["canGo"] =true;
         this.store.dispatch(indexAction.playTurn(data));
     }
 
     handleChat(data){
-        console.log("chat mess server "+JSON.stringify(data));
         this.store.dispatch(indexAction.createMessage(data));
     }
 
     handleResultGame(data){
-        console.log("result game "+JSON.stringify(data));
-        alert("You lose");
+        console.log("result game "+JSON.stringify(data))
         this.store.dispatch(indexAction.createResultGame(data))
+
+        //alert("You lose");
 
 
     }
@@ -111,7 +114,6 @@ export default class Connection {
     handleMessage(message){
         const header = lodash.get(message, 'header');
         const data = lodash.get(message,'data');
-        console.log("rec "+header+data);
         switch(header){
             case 'create_room':
                 this.handleCreateRoom(data);
@@ -127,7 +129,6 @@ export default class Connection {
                 this.handleChat(data);
                 break;
             case 'game_result':
-                console.log("game result here");
                 this.handleResultGame(data);
                 break;    
 

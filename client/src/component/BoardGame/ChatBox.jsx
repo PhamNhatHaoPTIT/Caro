@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import 'antd/dist/antd.css';
 import './BoardGame.css';
-import { Card,Col, InputGroup,FormControl ,Button} from 'react-bootstrap';
+import { Card, InputGroup,FormControl ,Button} from 'react-bootstrap';
 import * as indexAction from '../../action/index'
 import {connect} from "react-redux"
 import { withRouter } from "react-router-dom";
@@ -23,8 +23,7 @@ class Chatbox extends Component{
 
     handleClickEnter = ()=>{
         const value= document.getElementById("input-message").value;
-        console.log("xx "+JSON.stringify(localStorage.getItem('roomInfor')));
-  
+        document.getElementById("input-message").value='';
 
         const chatMessInfor ={
             room_id: JSON.parse(localStorage.getItem('roomInfor')).id === undefined? JSON.parse(localStorage.getItem('roomInfor')).room_id : JSON.parse(localStorage.getItem('roomInfor')).id,
@@ -38,7 +37,6 @@ class Chatbox extends Component{
     }
 
     createChatMessageList(){
-        console.log("mess "+JSON.stringify(this.props.chatMessage))
         if(typeof this.props.chatMessage !=="undefined"){
             let listMess = this.props.chatMessage.map(
                 (each) =>{

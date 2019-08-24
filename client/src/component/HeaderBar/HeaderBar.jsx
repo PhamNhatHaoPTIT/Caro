@@ -20,7 +20,7 @@ class HeaderBar extends Component{
         return(
             <Header className="header-logo">
                     <div >
-                        <img />
+                        <img  alt=''/>
                         <h1>Kakuro</h1>
                     </div>
                     <Button onClick={this.logout}>Log out</Button>

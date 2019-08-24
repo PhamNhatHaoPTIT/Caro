@@ -6,9 +6,7 @@ import {connect} from "react-redux"
 
 class GameInfor extends Component{
 
-    
     render(){
-        console.log("game user infor "+JSON.stringify(JSON.parse(localStorage.getItem('gameUserInfor'))))
         return(
             
         <Card  className="game-infor" >
@@ -16,14 +14,14 @@ class GameInfor extends Component{
                 {this.props.canGo===true? "Your turn" : "Wait to your turn"}
             </Card.Header>
             <Card.Body>
-                <Card className="bet-point">Bet point: {JSON.parse(localStorage.getItem('gameUserInfor')).bet_point} p</Card>
+                <Card className="bet-point">Bet point: {this.props.bet_point} p</Card>
                 <UserInfor 
-                    username={JSON.parse(localStorage.getItem('gameUserInfor')).host}
+                    username={this.props.host}
                     src={"https://i.pinimg.com/564x/0e/f3/88/0ef388a7c15a72578a8bdaef6665696a.jpg"}>
 
                 </UserInfor>
                 <UserInfor 
-                    username={JSON.parse(localStorage.getItem('gameUserInfor')).guest}
+                    username={this.props.guest}
                         src={"https://i.pinimg.com/564x/81/a2/54/81a2541db762d74e3c753e17c5960eeb.jpg"}>
 
                 </UserInfor>
@@ -36,9 +34,11 @@ class GameInfor extends Component{
 }
 
 function mapStateToProps(state){
-
     return{
         canGo: state.boardGame.canGo,
+        host : state.gameUserInfor.host,
+        guest: state.gameUserInfor.guest,
+        bet_point: state.gameUserInfor.bet_point,
     }
 }
 

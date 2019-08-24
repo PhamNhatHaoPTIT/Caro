@@ -14,7 +14,7 @@ class InforUser extends Component{
             <Card.Header>
                 <Row >
                     <Col>
-                        <img ></img>
+                        <img  alt=''></img>
                     </Col>
                 </Row>
                 <Row >

@@ -1,16 +1,45 @@
 import React, { Component } from "react";
 import "./Dashboard.css"
-import DashboardContainer from "../../container/DashBoardContainer";
+// import DashboardContainer from "../../container/DashBoardContainer";
 import RoomList from "./RoomList"
 import InforUser from "./InforUser"
 import Rank from "./Rank"
 import {connect} from 'react-redux';
 import {Container,Col,Row } from 'react-bootstrap';
+import * as helper from '../../helper/Helper'
 import Api from '../../api/Api'
+import Axios from "axios";
+import * as indexAction from '../../action/index'
+
+
 
 class Dashboard extends Component{
+    constructor(props){
+        super(props);
 
-    
+        this.state = {
+            userInfor:JSON.parse(localStorage.getItem('userInfor')),
+            rankItems:this.props.rankItems,
+        }
+    }
+
+
+    componentDidMount(){
+        const api = new Api();
+
+
+        api.get('user/'+JSON.parse(localStorage.getItem('userInfor'))._id,
+           ).then(response=>{
+            localStorage.setItem('userInfor',JSON.stringify(response.data))
+            this.setState({userInfor:response.data})
+            console.log("res "+ JSON.stringify(response.data));
+
+        }).catch(err =>{
+            console.log("get user infor err "+ err);
+
+        })
+
+    }
 
     render(){
         return(
@@ -22,7 +51,7 @@ class Dashboard extends Component{
                         </RoomList>
                     </Col>
                     <Col xl={4} lg={12} md={12} sm={12}>
-                      <InforUser userInfor={this.props.userInfor}></InforUser>
+                      <InforUser userInfor={this.state.userInfor}></InforUser>
                       <Rank rankItems={this.props.rankItems}></Rank>
                     </Col>
                 </Row>
@@ -35,39 +64,20 @@ class Dashboard extends Component{
 
 }
 
-const api = new Api();
 
-function getUserInfor(){
-    return new Promise((resolve,reject) =>{
-        api.get('user/'+JSON.parse(localStorage.getItem('userInfor'))._id).then((response)=>{
-            console.log(response.data)
-            localStorage.setItem('userInfor',JSON.stringify(response.data.user))
-            localStorage.setItem('token',JSON.stringify(response.data.token))
 
-            this.props.addUserInfor(response.data.user);
-
-            if(response.status===200)
-                this.props.history.push({
-                pathname: '/',
-              })
-                
-        }).catch((err)=>{
-            console.log("login err",err);
-        })
-    });
-}
 
 function mapStateToProps(state){
-    // getUserInfor()
-    var userInfor = JSON.parse(localStorage.getItem('userInfor'));
     
     return{
-        userInfor: userInfor,
+        userInfor: state.userInfor,
         rankItems: state.rankItems,
 
 
     }
 }
+
+
 
 
 

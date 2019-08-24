@@ -44,6 +44,7 @@ class RoomItem extends Component{
                 guest: JSON.parse(localStorage.getItem('userInfor')).username
             }
             
+            
 
             
             this.props.joinNewRoom(joinInfor);
@@ -53,27 +54,6 @@ class RoomItem extends Component{
                     joinInfor: joinInfor
                 }
             })
-
-
-            // return new Promise((resolve,reject) =>{
-            //     api.put('rooms',joinInfor).then((response)=>{
-            //         console.log("rom abc "+JSON.stringify(response.data))
-            //         //this.props.createNewRoom(response.data)
-        
-            //         if(response.status===200)
-            //             this.props.history.push({
-            //             pathname: '/game',
-            //             state:{
-            //                 joinInfor: response.data
-            //             }
-            //           })
-                    
-            //           this.props.joinNewRoom(response.data);
-                        
-            //     }).catch((err)=>{
-            //         console.log("login err",err);
-            //     })
-            // })
         }
 
     }
@@ -86,7 +66,7 @@ class RoomItem extends Component{
             <Container>
                 <Row>
                 <Col lg={2} md={2} sm={2} >
-                    <img/>
+                    <img  alt=''/>
                 </Col>
                 <Col  lg={8} md={8} sm={8} className="text">
                     <Card.Title>Host: {this.state.host} </Card.Title>

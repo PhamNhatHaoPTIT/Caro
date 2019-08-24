@@ -4,8 +4,8 @@ import Board from '../component/BoardGame/Board';
 import GameInfor from '../component/BoardGame/GameInfor'
 import {connect} from 'react-redux';
 import {Container,Col,Row } from 'react-bootstrap';
-import {bindActionCreators} from 'redux'
-import { func } from 'prop-types';
+// import {bindActionCreators} from 'redux'
+// import { func } from 'prop-types';
 
 class BoardGameContainer extends Component{
 

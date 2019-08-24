@@ -3,6 +3,9 @@ import 'antd/dist/antd.css';
 import './BoardGame.css';
 import {connect} from 'react-redux';
 import * as indexAction from '../../action/index'
+import { Modal, Button } from 'antd';
+import { withRouter } from "react-router-dom";
+
 
 
 class Board extends Component{
@@ -16,6 +19,8 @@ class Board extends Component{
          gameEnded: false,
          host: JSON.parse(localStorage.getItem('roomInfor')).host,
          canGo: this.props.canGo,
+         result : this.props.result,
+         visible: this.props.visible,
       }
    }
 
@@ -126,7 +131,6 @@ class Board extends Component{
    }
 
    checkWin(matrix, x ,y, value){
-      console.log("board "+ this.state.board +" "+x +" "+y+" " )
 
       if(this.checkDiagonal(matrix,x,y,value) || this.checkHorizontal(matrix,x,y,value) 
          || this.checkMainDiagonal(matrix,x,y,value) || this.checkVertically(matrix,x,y,value)){
@@ -136,7 +140,9 @@ class Board extends Component{
                sender: JSON.parse(localStorage.getItem("userInfor")).username,
                room_id: JSON.parse(localStorage.getItem('gameUserInfor')).room_id,
             })
-            alert("You win");
+            this.state.result = "You win"
+            this.showModal()
+            // alert("You win");
          }
       else if(this.checkDraw(matrix)) 
       {
@@ -146,7 +152,8 @@ class Board extends Component{
             sender: JSON.parse(localStorage.getItem("userInfor")).username,
             room_id: JSON.parse(localStorage.getItem('gameUserInfor')).room_id,
          })
-         alert("Draw");
+         this.state.result = "Draw"
+        //  alert("Draw");
       }  
       else 
          console.log("checkwin false")
@@ -223,23 +230,58 @@ class Board extends Component{
       }
    }
 
+ 
+
+   showModal = () => {
+    this.setState({
+      visible: true,
+    });
+  };
+
+  handleOk = e => {
+    console.log("ok "+e);
+    this.props.history.push({
+        pathname: '/'
+    })
+    this.setState({
+      visible: false,
+    });
+  };
+
+
+
     render(){
+     
         return(
-            <div className="board-grid" 
-                >
-               {
-                  this.createCell()
-               }
+            <div>
+                <div className="board-grid" 
+                    >
+                {
+                    this.createCell()
+                }
+                </div>
+                <Modal
+                    title="Result game"
+                    visible={this.state.visible || this.props.visible}
+                    onOk={this.handleOk}
+                    >
+                        {this.state.result == 'Draw' ? this.props.result : this.state.result}
+                    </Modal>
             </div>
+
         )
     }
 }
 
 
 function mapStatetoProps(state){
+    console.log("state visible "+state.boardGame.visible)
+
    return{
      board: state.boardGame.board,
      canGo: state.boardGame.canGo,
+     result: state.boardGame.result,
+     visible: state.boardGame.visible,
 
    }
 }
@@ -252,5 +294,5 @@ const mapDispatchToProps = (dispatch) =>{
 }
  
  
- export default connect(mapStatetoProps,mapDispatchToProps)(Board);
+ export default withRouter(connect(mapStatetoProps,mapDispatchToProps)(Board));
  

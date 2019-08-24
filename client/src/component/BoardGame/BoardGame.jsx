@@ -3,7 +3,7 @@ import 'antd/dist/antd.css';
 import './BoardGame.css';
 import Board from './Board';
 import GameInfor from './GameInfor'
-import BoardGameContainer from "../../container/BoardGameContainer";
+// import BoardGameContainer from "../../container/BoardGameContainer";
 import {Container,Col,Row } from 'react-bootstrap';
 import ChatBox from './ChatBox'
 

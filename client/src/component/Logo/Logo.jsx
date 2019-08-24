@@ -7,7 +7,7 @@ export default class Logo extends Component{
         return (
             <div className="logo">
                
-                <img />
+                <img  alt=''/>
                 <h1 className="logo">Kakuro</h1>
                
             </div>
