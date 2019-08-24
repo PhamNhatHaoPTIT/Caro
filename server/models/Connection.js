@@ -276,20 +276,20 @@ class Connection {
                 if(!connection){
                     return;
                 }
-                await this.app.models.room.findRoomById(connection.room_id).then((room) => {
+                await this.app.models.room.findRoomById(connection.room_id).then( async (room) => {
                     console.log('in room: ' + JSON.stringify(room));
                     if(lodash.get(room, 'host_socket') === socketId) {
                         const data = {
                             room_id: connection.room_id,
                             sender: room.guest,
-                            result: 'win'
+                            result: 'lose'
                         }
-                        this.handelGameResult(data);
+                        await this.handelGameResult(data);
                     } else {
                         const data = {
                             room_id: connection.room_id,
                             sender: room.host,
-                            result: 'win'
+                            result: 'lose'
                         }
                         this.handelGameResult(data);
                     }
