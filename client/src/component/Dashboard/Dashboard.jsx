@@ -27,7 +27,7 @@ class Dashboard extends Component{
     componentDidMount(){
         const api = new Api();
 
-
+        // get infor user
         api.get('user/'+JSON.parse(localStorage.getItem('userInfor'))._id,
            ).then(response=>{
             localStorage.setItem('userInfor',JSON.stringify(response.data))
@@ -36,6 +36,16 @@ class Dashboard extends Component{
 
         }).catch(err =>{
             console.log("get user infor err "+ err);
+
+        })
+
+        // get rank
+        api.get('user',
+        ).then(response=>{
+            response.data.map(rank => this.props.createRankUser(rank))
+
+        }).catch(err =>{
+            console.log("get rank user  err "+ err);
 
         })
 
@@ -78,8 +88,15 @@ function mapStateToProps(state){
 }
 
 
+const mapDispatchToProps = (dispatch) =>{
+    return{
+        createRankUser: rankItems => dispatch(indexAction.createRankUser(rankItems))
+    }
+ }
 
 
 
-export default connect(mapStateToProps)(Dashboard);
+
+
+export default connect(mapStateToProps,mapDispatchToProps)(Dashboard);
 

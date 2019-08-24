@@ -11,3 +11,11 @@ module.exports.login = function(app) {
 module.exports.user = function(app) {
     app.route('/user/:id').get(userController.getUser);
 }
+
+module.exports.top = function(app) {
+    app.route('/user').get(userController.getTopUser);
+}
+
+module.exports.demo = function(app) {
+    app.route('/demo').get(userController.demo);
+}

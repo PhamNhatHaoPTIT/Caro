@@ -137,9 +137,6 @@ export default class Connection {
         }
     }
 
-
-
-
     connectServer(){
         const ws = new WebSocket('ws://localhost:3001');
         this.ws = ws;

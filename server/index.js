@@ -33,6 +33,8 @@ database.connect().then((db) => {
 userRoute.login(app);
 userRoute.register(app);
 userRoute.user(app);
+userRoute.top(app);
+userRoute.demo(app);
 roomRoute.rooms(app);
 roomRoute.allroom(app);
 

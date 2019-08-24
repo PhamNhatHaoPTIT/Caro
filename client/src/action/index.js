@@ -2,10 +2,11 @@ import * as actionTypes from './ActionType';
 import axios from 'axios'
 import Connection from '../websocket/Connection'
 
-const connection = new Connection();
+var connection= '';
 
 
 export const createSocket = () =>{
+    connection = new Connection();
     connection.sendAuthentication();
 }
 
@@ -35,7 +36,6 @@ export const createListRoom = (roomInfor) =>{
 }
 
 export const deleteRoom = (roomInfor) =>{
-    console.log("room infor "+JSON.stringify(roomInfor))
     return{
         type: actionTypes.DELETE_ROOM,
         roomInfor: roomInfor,
@@ -46,7 +46,6 @@ export const deleteRoom = (roomInfor) =>{
 export const joinRoom = (roomInfor) =>{
     connection.sendJoinRoom(roomInfor);
 
-    console.log("room join "+JSON.stringify(roomInfor))    
     return{
         type: actionTypes.JOIN_ROOM,
         roomInfor: roomInfor
@@ -78,7 +77,6 @@ export const createResultGame = (resultGame) =>{
 
 
 export const createMessage = (chatMessageInfor) =>{
-    console.log("chat message "+JSON.stringify(chatMessageInfor))  
     connection.sendChatMessage(chatMessageInfor);  
     return{
         type: actionTypes.CREATE_MESSAGE,
@@ -88,6 +86,13 @@ export const createMessage = (chatMessageInfor) =>{
 
 export const sendResultGame = (result) =>{
     connection.sendResultGame(result);
+}
+
+export const createRankUser = (rankItems) =>{
+    return{
+        type: actionTypes.CREATE_RANK_USER,
+        rankItems: rankItems,
+    }
 }
 
 

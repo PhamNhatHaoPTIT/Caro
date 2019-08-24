@@ -9,15 +9,19 @@ import RankItem from './RankItem'
 class Rank extends Component{
 
     createRankItemList(){
-        let listItem = this.props.rankItems.map(
-            (eachRankItem,index) =>{
-                return(
-                    <RankItem key={index} username={eachRankItem.username} point={eachRankItem.point} avatar={eachRankItem.avatar}></RankItem>
-                );
-            }
-        );
-        
-        return listItem;
+        if(this.props.rankItems !== undefined)
+        {
+            let listItem = this.props.rankItems.map(
+                (eachRankItem,index) =>{
+                    return(
+                        <RankItem key={index} username={eachRankItem.username} point={eachRankItem.point} avatar={eachRankItem.avatar}></RankItem>
+                    );
+                }
+            );
+            
+            return listItem;
+        }
+
 
     }
     

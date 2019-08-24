@@ -27,7 +27,6 @@ class Room {
                     'host_socket': socketId,
                     'bet_point': betPoint,
                     'is_played': 0,
-                    'prev_turn': 'null',
                     'create_time': createTime
                 });
                 const roomFormat = {
@@ -48,8 +47,7 @@ class Room {
                 'is_played': 1,
                 'guest': guest,
                 'guest_id': guestId,
-                'guest_socket': socketId,
-                'prev_turn': 2
+                'guest_socket': socketId
             });
             // get room to send all client
             client.hgetall('room:' + roomId, (err, object) => {
@@ -99,7 +97,6 @@ class Room {
 
     getAllRoomName() {
         const scanner = new redisScan(client);
-        let listRoomName = new ArrayList;
         return new Promise((resolve, reject) => {
             scanner.scan('room:*', (err, matchingKeys) => {
                 if (err) reject(err);        
@@ -119,6 +116,16 @@ class Room {
         }
         return listRoom;
     }
+
+    deleteRoom(roomId) {
+        return new Promise((resolve, reject) => {
+            client.del('room:' + roomId, function(err, reply) {
+                if(err) reject(err);
+                resolve({message: 'room deleted'});
+            });
+        });
+    }
+
 }
 
 module.exports = Room;

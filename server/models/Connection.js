@@ -3,7 +3,6 @@ const { ObjectId } = require('mongodb');
 const lodash = require('lodash');
 const token = require('../models/Token.js');
 
-
 class Connection {
 
     constructor(app) {
@@ -38,26 +37,27 @@ class Connection {
         this.sendMessage(ws, message);
     }
 
-    handleCreateRoom(socketId ,data) {
+    handleCreateRoom(socketId ,data, clientConnection) {
         this.app.models.room.createRoom(socketId, data).then((room) => {
             const message = {
                 header: 'create_room',
                 data: room
             };
             // client receive 'create_room' message -> show new room game in front end
-            console.log("create room");
+            clientConnection.room_id = lodash.get(room, 'id');
             this.sendAllUserOnline(message);
         }).catch((err) => {
             console.log("error: ", err);
         });
     }
 
-    handleJoinRoom(socketId,data) {
+    handleJoinRoom(socketId, data, clientConnection) {
         this.app.models.room.updateRoom(socketId ,data.room_id,data.guest,data.guest_id).then((room) => {
             const message = {
                 header: 'join_room',
                 data: room
             };
+            clientConnection.room_id = data.room_id;
             // client receive 'join_room' message -> hide game room because room is played by 2 others player
             this.sendAllUserOnline(message);
         }).catch((err) => {
@@ -67,7 +67,7 @@ class Connection {
 
     playGame(room, userId, x, y) {
         let message;
-        if(userId === room.host_id) {
+        if(userId === lodash.get(room, 'host_id')) {
             // send to 2 player
             message = {
                 header: 'play_game',
@@ -78,7 +78,7 @@ class Connection {
                     value: 1                      // 1 -> host play -> X symbol
                 }
             }
-            this.sendMessage((this.listConnections.get(room.guest_socket)).ws, message);
+            this.sendMessage((this.listConnections.get(lodash.get(room, 'guest_socket'))).ws, message);
         } else {
             // send to 2 player
             message = {
@@ -90,7 +90,7 @@ class Connection {
                     value: 2                      // 2 -> guest play -> O symbol
                 }
             }
-            this.sendMessage((this.listConnections.get(room.host_socket)).ws, message);
+            this.sendMessage((this.listConnections.get(lodash.get(room, 'host_socket'))).ws, message);
         }
     }
 
@@ -100,26 +100,61 @@ class Connection {
         const x = lodash.get(data, 'x');
         const y = lodash.get(data, 'y');
 
-        const room = await this.app.models.room.findRoomById(roomId);
-        this.playGame(room, userId, x, y);            
+        await this.app.models.room.findRoomById(roomId).then((room) => {
+            this.playGame(room, userId, x, y);
+        }).catch((err) => {
+            
+        });
     }
 
     async handleChat(data) {
         const roomId = lodash.get(data,'room_id');
         const sender = lodash.get(data,'sender');
         const content = lodash.get(data, 'content');
-        const room = await this.app.models.room.findRoomById(roomId);
-        const message = {
-            header: 'chat',
-            data:
-            {
-            content: content,
-            sender: sender                    // 2 -> guest play -> O symbol
+        await this.app.models.room.findRoomById(roomId).then((room) => {
+            const message = {
+                header: 'chat',
+                data:
+                {
+                content: content,
+                sender: sender
+                }
+            }
+            if(sender === lodash.get(room, 'host')) {
+                this.sendMessage((this.listConnections.get(lodash.get(room, 'guest_socket'))).ws,message); 
+            } else this.sendMessage((this.listConnections.get(lodash.get(room, 'host_socket'))).ws,message);
+        }).catch((err) => {
+
+        });
+    }
+
+    async saveCache(listTop) {
+        for(let i = 0; i < listTop.length; i++) {
+            await this.app.models.user.savePlayerInRedis(listTop[i].point, listTop[i].username);
+        }
+    }
+
+    async handleTopPlayer(host, guest) {
+        let checkRoom = await this.app.models.user.checkListTopPlayer();
+        let listTop;
+        if(checkRoom == 0) {
+            listTop = await this.app.models.user.getTop();              // get top 5 player in mongo db
+            await this.saveCache(listTop);
+        } else {
+            listTop = await this.app.models.user.getListTopPlayer();             // get list top in redis
+        }
+        for(let i = listTop.length - 1 ; i >= 0; i--) {
+            if(host == lodash.get(listTop[i], 'username') || guest == lodash.get(listTop[i], 'username')) {
+                await this.app.models.user.deleteCache(); 
+                listTop = await this.app.models.user.getTop();              // get top 5 player in mongo db
+                await this.saveCache(listTop);
+                const message = {
+                    header: 'rank',
+                    data: listTop
+                }
+                this.sendAllUserOnline(message);
             }
         }
-        if(sender === room.host ) {
-            this.sendMessage((this.listConnections.get(room.guest_socket)).ws,message); 
-        } else this.sendMessage((this.listConnections.get(room.host_socket)).ws,message);
     }
 
     async handelGameResult(data) {
@@ -128,7 +163,6 @@ class Connection {
         const result = lodash.get(data, 'result');
 
         const room = await this.app.models.room.findRoomById(roomId);
-        console.log("room: " + JSON.stringify(room));
         const message = {
             header: 'game_result',
             data:
@@ -143,6 +177,7 @@ class Connection {
                 winner = sender;
                 await this.app.models.user.updateUser(room.host_id, 'win', room);
                 await this.app.models.user.updateUser(room.guest_id, 'lose', room);
+                await this.handleTopPlayer(room.host, room.guest);            // check and update list top player for winner
             } else {
                 await this.app.models.user.updateUser(room.host_id, 'draw', room);
                 await this.app.models.user.updateUser(room.guest_id, 'draw', room);
@@ -153,12 +188,14 @@ class Connection {
                 winner = sender;
                 await this.app.models.user.updateUser(room.host_id, 'lose', room);
                 await this.app.models.user.updateUser(room.guest_id, 'win', room);
+                await this.handleTopPlayer(room.host, room.guest);            // check and update list top player for winner
             } else {
                 await this.app.models.user.updateUser(room.host_id, 'draw', room);
                 await this.app.models.user.updateUser(room.guest_id, 'draw', room);
             }
             this.sendMessage((this.listConnections.get(room.host_socket)).ws,message);
         }
+
         const game = {
             host: room.host,
             guest: room.guest,
@@ -168,6 +205,11 @@ class Connection {
             bet_point: room.bet_point
         }
         this.app.models.game.createGame(game);
+        await this.app.models.room.deleteRoom(roomId).then((data) => {
+            console.log('room: ' + roomId + ' finished play');
+        }).catch((err) => {
+            console.log('err delete room: ' + err);
+        });
     }
 
 
@@ -189,10 +231,12 @@ class Connection {
                 clientConnection = this.listConnections.get(socketId);
                 break;
             case 'create_room':
-                    this.handleCreateRoom(socketId, data);
+                    clientConnection = this.listConnections.get(socketId);
+                    this.handleCreateRoom(socketId, data, clientConnection);
                     break;
             case 'join_room':
-                    this.handleJoinRoom(socketId, data);
+                    clientConnection = this.listConnections.get(socketId);
+                    this.handleJoinRoom(socketId, data, clientConnection);
                     break;
             case 'play_game':
                 this.handlePlayGame(data);
@@ -214,39 +258,44 @@ class Connection {
                 _id: socketId,
                 ws: ws,
                 userId: null,
+                room_id: ''
             };
             this.listConnections = this.listConnections.set(socketId, clientConnection);
 
             ws.on('message', (msg) => {
                 const messageClient = this.decodeMessage(msg);
-                console.log("msg: ", msg);
-
-                const tokenObj = lodash.get(messageClient, 'token');
-                // verify token from token field client sent
-                // token.verifyToken(tokenObj).then((result) => {
-
-                // }).catch((err) => {
-                //     const connection = this.listConnections.get(socketId);
-                //     if (connection) {
-                //         let message = {
-                //             header: "unauthenticated",
-                //             data: "403",
-                //         }
-                //         this.sendMessage(connection.ws, message);
-                //     }
-                // })
-
+                console.log("client send message: ", msg);
                 const header = lodash.get(messageClient, 'header');
                 const data = lodash.get(messageClient, 'data');
                 this.handelMessage(socketId, header, data);
             })
 
-            ws.on('close', () => {
-                console.log("disconnection to the server: ", socketId);
+            ws.on('close', async () => {
+                console.log("client disconnected: ", socketId);
                 const connection = this.listConnections.get(socketId);
                 if(!connection){
                     return;
                 }
+                await this.app.models.room.findRoomById(connection.room_id).then((room) => {
+                    console.log('in room: ' + JSON.stringify(room));
+                    if(lodash.get(room, 'host_socket') === socketId) {
+                        const data = {
+                            room_id: connection.room_id,
+                            sender: room.guest,
+                            result: 'win'
+                        }
+                        this.handelGameResult(data);
+                    } else {
+                        const data = {
+                            room_id: connection.room_id,
+                            sender: room.host,
+                            result: 'win'
+                        }
+                        this.handelGameResult(data);
+                    }
+                }).catch((err) => {
+
+                });
                 this.listConnections = this.listConnections.remove(socketId);
             })
         });
