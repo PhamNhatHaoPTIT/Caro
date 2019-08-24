@@ -37,25 +37,27 @@ class Connection {
         this.sendMessage(ws, message);
     }
 
-    handleCreateRoom(socketId ,data) {
+    handleCreateRoom(socketId ,data, clientConnection) {
         this.app.models.room.createRoom(socketId, data).then((room) => {
             const message = {
                 header: 'create_room',
                 data: room
             };
             // client receive 'create_room' message -> show new room game in front end
+            clientConnection.room_id = lodash.get(room, 'id');
             this.sendAllUserOnline(message);
         }).catch((err) => {
             console.log("error: ", err);
         });
     }
 
-    handleJoinRoom(socketId,data) {
+    handleJoinRoom(socketId, data, clientConnection) {
         this.app.models.room.updateRoom(socketId ,data.room_id,data.guest,data.guest_id).then((room) => {
             const message = {
                 header: 'join_room',
                 data: room
             };
+            clientConnection.room_id = data.room_id;
             // client receive 'join_room' message -> hide game room because room is played by 2 others player
             this.sendAllUserOnline(message);
         }).catch((err) => {
@@ -229,10 +231,12 @@ class Connection {
                 clientConnection = this.listConnections.get(socketId);
                 break;
             case 'create_room':
-                    this.handleCreateRoom(socketId, data);
+                    clientConnection = this.listConnections.get(socketId);
+                    this.handleCreateRoom(socketId, data, clientConnection);
                     break;
             case 'join_room':
-                    this.handleJoinRoom(socketId, data);
+                    clientConnection = this.listConnections.get(socketId);
+                    this.handleJoinRoom(socketId, data, clientConnection);
                     break;
             case 'play_game':
                 this.handlePlayGame(data);
@@ -254,6 +258,7 @@ class Connection {
                 _id: socketId,
                 ws: ws,
                 userId: null,
+                room_id: ''
             };
             this.listConnections = this.listConnections.set(socketId, clientConnection);
 
@@ -265,12 +270,32 @@ class Connection {
                 this.handelMessage(socketId, header, data);
             })
 
-            ws.on('close', () => {
+            ws.on('close', async () => {
                 console.log("client disconnected: ", socketId);
                 const connection = this.listConnections.get(socketId);
                 if(!connection){
                     return;
                 }
+                await this.app.models.room.findRoomById(connection.room_id).then((room) => {
+                    console.log('in room: ' + JSON.stringify(room));
+                    if(lodash.get(room, 'host_socket') === socketId) {
+                        const data = {
+                            room_id: connection.room_id,
+                            sender: room.guest,
+                            result: 'win'
+                        }
+                        this.handelGameResult(data);
+                    } else {
+                        const data = {
+                            room_id: connection.room_id,
+                            sender: room.host,
+                            result: 'win'
+                        }
+                        this.handelGameResult(data);
+                    }
+                }).catch((err) => {
+
+                });
                 this.listConnections = this.listConnections.remove(socketId);
             })
         });
