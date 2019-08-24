@@ -131,7 +131,6 @@ class User {
         return new Promise( async (resolve, reject) => {
             const db = this.app.db;
             let user = await this.findUserById(id);
-            console.log("user: " + JSON.stringify(user));
             let winGame = parseInt(user.win_game);
             let point = parseInt(user.point);
             let totalGame = parseInt(user.total_game);
@@ -145,7 +144,6 @@ class User {
             var query = {username: user.username};
             var value = { $set: { total_game: totalGame, point: point, win_game: winGame } };
             db.collection("users").updateOne(query, value, function(err, res){
-                console.log("in callback");
                 if(err) {
                     reject({err: 'update user failed'});
                 }

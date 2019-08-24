@@ -45,7 +45,6 @@ class Connection {
                 data: room
             };
             // client receive 'create_room' message -> show new room game in front end
-            console.log("create room");
             this.sendAllUserOnline(message);
         }).catch((err) => {
             console.log("error: ", err);
@@ -67,7 +66,7 @@ class Connection {
 
     playGame(room, userId, x, y) {
         let message;
-        if(userId === room.host_id) {
+        if(userId === lodash.get(room, 'host_id')) {
             // send to 2 player
             message = {
                 header: 'play_game',
@@ -78,7 +77,7 @@ class Connection {
                     value: 1                      // 1 -> host play -> X symbol
                 }
             }
-            this.sendMessage((this.listConnections.get(room.guest_socket)).ws, message);
+            this.sendMessage((this.listConnections.get(lodash.get(room, 'guest_socket'))).ws, message);
         } else {
             // send to 2 player
             message = {
@@ -90,7 +89,7 @@ class Connection {
                     value: 2                      // 2 -> guest play -> O symbol
                 }
             }
-            this.sendMessage((this.listConnections.get(room.host_socket)).ws, message);
+            this.sendMessage((this.listConnections.get(lodash.get(room, 'host_socket'))).ws, message);
         }
     }
 
@@ -100,26 +99,32 @@ class Connection {
         const x = lodash.get(data, 'x');
         const y = lodash.get(data, 'y');
 
-        const room = await this.app.models.room.findRoomById(roomId);
-        this.playGame(room, userId, x, y);            
+        await this.app.models.room.findRoomById(roomId).then((room) => {
+            this.playGame(room, userId, x, y);
+        }).catch((err) => {
+            
+        });
     }
 
     async handleChat(data) {
         const roomId = lodash.get(data,'room_id');
         const sender = lodash.get(data,'sender');
         const content = lodash.get(data, 'content');
-        const room = await this.app.models.room.findRoomById(roomId);
-        const message = {
-            header: 'chat',
-            data:
-            {
-            content: content,
-            sender: sender                    // 2 -> guest play -> O symbol
+        await this.app.models.room.findRoomById(roomId).then((room) => {
+            const message = {
+                header: 'chat',
+                data:
+                {
+                content: content,
+                sender: sender
+                }
             }
-        }
-        if(sender === room.host ) {
-            this.sendMessage((this.listConnections.get(room.guest_socket)).ws,message); 
-        } else this.sendMessage((this.listConnections.get(room.host_socket)).ws,message);
+            if(sender === lodash.get(room, 'host')) {
+                this.sendMessage((this.listConnections.get(lodash.get(room, 'guest_socket'))).ws,message); 
+            } else this.sendMessage((this.listConnections.get(lodash.get(room, 'host_socket'))).ws,message);
+        }).catch((err) => {
+
+        });
     }
 
     async handelGameResult(data) {
@@ -128,7 +133,6 @@ class Connection {
         const result = lodash.get(data, 'result');
 
         const room = await this.app.models.room.findRoomById(roomId);
-        console.log("room: " + JSON.stringify(room));
         const message = {
             header: 'game_result',
             data:
@@ -168,6 +172,11 @@ class Connection {
             bet_point: room.bet_point
         }
         this.app.models.game.createGame(game);
+        await this.app.models.room.deleteRoom(roomId).then((data) => {
+            console.log('room: ' + roomId + ' finished play');
+        }).catch((err) => {
+            console.log('err delete room: ' + err);
+        });
     }
 
 
@@ -219,30 +228,14 @@ class Connection {
 
             ws.on('message', (msg) => {
                 const messageClient = this.decodeMessage(msg);
-                console.log("msg: ", msg);
-
-                const tokenObj = lodash.get(messageClient, 'token');
-                // verify token from token field client sent
-                // token.verifyToken(tokenObj).then((result) => {
-
-                // }).catch((err) => {
-                //     const connection = this.listConnections.get(socketId);
-                //     if (connection) {
-                //         let message = {
-                //             header: "unauthenticated",
-                //             data: "403",
-                //         }
-                //         this.sendMessage(connection.ws, message);
-                //     }
-                // })
-
+                console.log("client send message: ", msg);
                 const header = lodash.get(messageClient, 'header');
                 const data = lodash.get(messageClient, 'data');
                 this.handelMessage(socketId, header, data);
             })
 
             ws.on('close', () => {
-                console.log("disconnection to the server: ", socketId);
+                console.log("client disconnected: ", socketId);
                 const connection = this.listConnections.get(socketId);
                 if(!connection){
                     return;

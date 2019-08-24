@@ -30,7 +30,7 @@ export default class Connection {
     }
 
     sendAuthentication(){
-        this.sendMessage("authenticated",JSON.parse(localStorage.getItem('token')))
+        this.sendMessage("authenticated", JSON.parse(localStorage.getItem('token')))
     }
 
     sendCreateRoom(roomInfor){
@@ -135,9 +135,6 @@ export default class Connection {
                 break;
         }
     }
-
-
-
 
     connectServer(){
         const ws = new WebSocket('ws://localhost:3001');
