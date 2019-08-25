@@ -3,9 +3,18 @@ import 'antd/dist/antd.css';
 import './Signup.css';
 import { Form, Icon, Input, Button, Card } from 'antd';
 import Api from '../../api/Api'
-
+import * as indexAction from '../../action/index'
+import {connect} from "react-redux"
+import { withRouter } from "react-router-dom";
 
 class CardSignup extends Component{
+    constructor(props){
+        super(props);
+
+        this.state = {
+            signupErr : ''
+        }
+    }
 
     signup(values){
         const api = new Api();
@@ -16,7 +25,6 @@ class CardSignup extends Component{
 
         return new Promise((resolve,reject) =>{
             api.post('register',user).then((response)=>{
-                console.log(response.data)
                 localStorage.setItem('userInfor',JSON.stringify(response.data.user))
                 localStorage.setItem('token',JSON.stringify(response.data.token))
 
@@ -26,30 +34,47 @@ class CardSignup extends Component{
                     this.props.history.push({
                     pathname: '/',
                   })
+                  
             }).catch((err)=>{
+                this.setState({
+                    signupErr : "Username is existing, choose another one"
+                })
                 console.log("login err",err);
             })
         })
 
     }
 
+    componentWillMount(){
+
+    }
+
     handleSubmit = e => {
+
 
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-            console.log('Received values of form1: ', values);
 
           if (!err) {
                 this.signup(values);
                 
-            console.log('Received values of form: ', values);
           }
 
         });
       };
 
+    validateUsername = (rule, value, callback) => {
+      
+        const { form } = this.props;
 
-      compareToFirstPassword = (rule, value, callback) => {
+        if ( form.getFieldValue('username').length <4 || form.getFieldValue('username').length >14) {
+          callback('Username must length between 4 to 14');
+        } else {
+          callback();
+        }
+      };
+
+    compareToFirstPassword = (rule, value, callback) => {
         const { form } = this.props;
         if (value && value !== form.getFieldValue('password')) {
           callback('Two passwords that you enter is inconsistent!');
@@ -58,12 +83,17 @@ class CardSignup extends Component{
         }
       };
     
-      validateToNextPassword = (rule, value, callback) => {
+    validateToNextPassword = (rule, value, callback) => {
         const { form } = this.props;
-        if (value && this.state.confirmDirty) {
-          form.validateFields(['confirm'], { force: true });
-        }
-        callback();
+        if ( form.getFieldValue('password').length <4 || form.getFieldValue('password').length >14) {
+            callback('Password must length between 4 to 14');
+          } else {
+            if (value && this.state.confirmDirty) {
+                form.validateFields(['confirm'], { force: true });
+              }
+            callback();
+          }
+       
       };
     
     render(){
@@ -80,7 +110,14 @@ class CardSignup extends Component{
                     
                     <Form.Item>
                         {getFieldDecorator('username', {
-                            rules: [{ required: true, message: 'Please input your username!' }],
+                            rules: [
+                                { 
+                                    required: true, message: 'Please input your username!' 
+                                },
+                                {
+                                    validator: this.validateUsername,
+                                }
+                            ],
                         })(
                             <Input
                             prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
@@ -128,7 +165,7 @@ class CardSignup extends Component{
                         )}
                     </Form.Item>
 
-                   
+                   <div className="signup_err">{this.state.signupErr}</div>
                     <Form.Item>
 
                     <Button type="primary" htmlType="submit" className="Signup-form-button">
@@ -144,5 +181,13 @@ class CardSignup extends Component{
     }
 }
 
-export default Form.create()(CardSignup)
+
+const mapDispatchToProps = (dispatch) =>{
+    return{
+        addUserInfor: userInfor => dispatch(indexAction.addUserInfor(userInfor))
+    }
+}
+
+
+export default withRouter(connect(null, mapDispatchToProps)(Form.create()(CardSignup)))
 

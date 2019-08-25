@@ -1,6 +1,7 @@
 .login-form {
     max-width: 400px;
-    height: 250px;
+    height: 270px;
+    
   }
 
 .login-form-forgot {
@@ -52,7 +53,8 @@
 }
 
 
-
-
-
+.login_err{
+    color: red;
+    margin-bottom: 10px;
+}
 

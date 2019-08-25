@@ -1,6 +1,6 @@
 .Signup-form {
     max-width: 400px;
-    height: 300px;
+    height: 330px;
   }
 
 .Signup-form-forgot {
@@ -52,7 +52,10 @@
 }
 
 
-
+.signup_err{
+    color: red;
+    margin-bottom: 10px;
+}
 
 
 

@@ -23,13 +23,11 @@ export default class RoomItem extends Component{
         <Card  className="rank-item" >
                 <Row>
                     <Col lg="2" sm="12">
-                        <img  alt=''></img>
+                        <img className="avatar-rank" alt=''></img>
                     </Col>
-                    <Col lg="10" sm="12"  >
-                        <Card.Title>{this.state.username}</Card.Title>
-                        <Card.Text>
-                            {this.state.point} p
-                        </Card.Text>
+                    <Col lg="9" sm="12"  >
+                        <Card.Title><span> {this.state.username} -  {this.state.point} </span>  </Card.Title>
+                        
                     </Col>
                 </Row>
         </Card>

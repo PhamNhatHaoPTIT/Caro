@@ -5,7 +5,6 @@ export default class Cell extends React.Component {
   constructor(props){
     super(props)
 
-    console.log("value"+this.props.value);
 
     this.state ={
     
@@ -17,32 +16,7 @@ export default class Cell extends React.Component {
     
   }
 
-  // getValue(){
-  //   if(this.state.value ==='X'){
-  //     document.getElementById("imgcell-"+this.state.id).innerHTML='<img src={leaf} width="30px" height="30px" ></img>';
-  //     // return(
-  //     //   <img src={leaf} width="30px" height="30px" ></img>
-  //     // );
-  //   }
-  //   if(this.state.value ==='O'){
-  //       document.getElementById("imgcell-"+this.state.id).innerHTML='<img src={sakura} width="30px" height="30px" ></img>';
-        
-  //   }
-  // }
 
-
-
-//   componentDidUpdate(prevProps, prevState) {
-
-//     console.log('componentDidUpdate ' + prevProps.value+" "+this.state.value);
-   
-//     // this.getValue();
-
-// }
-// componentWillUpdate(nextProps, nextState) {
-//   console.log('componentWillUpdate ' + nextProps.value);
-
-// }
 
   render() {
 

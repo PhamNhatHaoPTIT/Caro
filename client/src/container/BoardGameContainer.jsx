@@ -34,7 +34,6 @@ class BoardGameContainer extends Component{
 }
 
 function mapStatetoProps(state){
-    console.log("x"+state.boardGame.board);
     return{
       board: state.boardGame.board,
 

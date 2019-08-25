@@ -19,7 +19,9 @@ class Chatbox extends Component{
         }
     }
 
-
+    componentDidUpdate() {
+        document.querySelector('#chat-box').scrollTo(0, document.querySelector('#chat-box').scrollHeight)
+    }
 
     handleClickEnter = ()=>{
         const value= document.getElementById("input-message").value;
@@ -59,7 +61,7 @@ class Chatbox extends Component{
             <Card.Header>
                Chat Box
             </Card.Header>
-            <Card.Body className="scrollbar scrollbar-near-moon">  
+            <Card.Body id="chat-box" className="scrollbar scrollbar-near-moon">  
                 {this.createChatMessageList()}
 
             </Card.Body> 

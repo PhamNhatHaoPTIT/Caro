@@ -11,8 +11,8 @@ code {
       sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-image: url('media/background.png');
-  
+    background-image: -webkit-linear-gradient(left,  #eccccb	 0%, 	#ffdcdb 21%,#e6eeff 78%,
+    #b4c8ea 100%);  
   
   }
 }

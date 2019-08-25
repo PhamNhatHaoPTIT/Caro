@@ -33,22 +33,14 @@ class Dashboard extends Component{
            ).then(response=>{
             localStorage.setItem('userInfor',JSON.stringify(response.data))
             this.setState({userInfor:response.data})
-            console.log("res "+ JSON.stringify(response.data));
-
-        }).catch(err =>{
-            console.log("get user infor err "+ err);
 
         })
 
         // get rank
         api.get('user',
         ).then(response=>{
-            console.log("get rank "+ response.data)
             this.props.refreshRankuser();
             response.data.map(rank => this.props.createRankUser(rank))
-
-        }).catch(err =>{
-            console.log("get rank user  err "+ err);
 
         })
 

@@ -107,7 +107,6 @@ export default class Connection {
     }
 
     handleResultGame(data){
-        console.log("result game "+JSON.stringify(data))
         this.store.dispatch(indexAction.createResultGame(data))
 
         //alert("You lose");
@@ -158,10 +157,7 @@ export default class Connection {
         ws.onclose = () =>{
             console.log("disconnect");
             this.isConnection = false;
-
         }
-
-
     }
 
 

@@ -32,11 +32,6 @@ class RoomItem extends Component{
         else{
             const api = new Api();
 
-            console.log("room id mess 1 "+ JSON.stringify(this.state));
-
-
-            // console.log("room id mess "+JSON.stringify( JSON.parse(localStorage.getItem('roomInfor'))))
-
             const joinInfor ={
                 token: JSON.parse(localStorage.getItem('token')),
                 room_id: this.state.room_id,
@@ -65,19 +60,20 @@ class RoomItem extends Component{
         <Card  className="card-room-item" >
             <Container>
                 <Row>
-                <Col lg={2} md={2} sm={2} >
+                <Col lg md sm="2" className="item item1">
                     <img  alt=''/>
+
                 </Col>
-                <Col  lg={8} md={8} sm={8} className="text">
+                <Col   lg md sm="8" className="text item item1">
                     <Card.Title>Host: {this.state.host} </Card.Title>
                     <Card.Text>
-                        {this.state.point} point
+
+                        {this.state.point} point -                         {moment(this.state.create_date).format('llll') }
+
                     </Card.Text>
-                    <Card.Text>
-                        {moment(this.state.create_date).format('llll') }
-                    </Card.Text>
+                   
                 </Col>
-                <Col  lg={2} md={2} sm={2}>
+                <Col  lg md sm="2" >
                     <Button onClick={this.joinRoom} >Join</Button>
                 </Col>
                 </Row>

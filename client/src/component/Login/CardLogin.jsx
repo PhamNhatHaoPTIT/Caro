@@ -9,6 +9,13 @@ import { withRouter } from "react-router-dom";
 
 
 class CardLogin extends Component{
+    constructor(props){
+        super(props);
+
+        this.state = {
+            loginErr : ''
+        }
+    }
 
     login(username, password){
         const api = new Api();
@@ -19,7 +26,6 @@ class CardLogin extends Component{
 
         return new Promise((resolve,reject) =>{
             api.post('login',user).then((response)=>{
-                console.log(response.data)
                 localStorage.setItem('userInfor',JSON.stringify(response.data.user))
                 localStorage.setItem('token',JSON.stringify(response.data.token))
 
@@ -34,19 +40,25 @@ class CardLogin extends Component{
 
                     
             }).catch((err)=>{
-                console.log("login err",err);
+                this.setState({
+                    loginErr:"Username or password is not correct"})
+                return err;
             })
         })
 
     }
 
     handleSubmit = e => {
+        this.setState({
+            loginErr:''
+        })
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
           if (!err) {
-            console.log('Received values of form: ', values);
             this.login(values.username,values.password);
-
+          }
+          else{
+            console.log("error "+err)
           }
         });
       };
@@ -76,7 +88,9 @@ class CardLogin extends Component{
                     </Form.Item>
                     <Form.Item>
                     {getFieldDecorator('password', {
-                        rules: [{ required: true, message: 'Please input your Password!' }],
+                        rules: [
+                            { required: true, message: 'Please input your Password!' },
+                        ],
                     })(
                         <Input
                         prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
@@ -85,12 +99,16 @@ class CardLogin extends Component{
                         />,
                     )}
                     </Form.Item>
+
+
+                    <div className="login_err">{this.state.loginErr}</div>
+
                     
                     <Form.Item>
 
-                    <Button type="primary" htmlType="submit" className="login-form-button">
-                        Log in
-                    </Button>
+                        <Button type="primary" htmlType="submit" className="login-form-button">
+                            Log in
+                        </Button>
 
                     </Form.Item>
 

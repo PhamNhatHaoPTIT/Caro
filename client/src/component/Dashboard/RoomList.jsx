@@ -29,7 +29,7 @@ class RoomList extends Component{
 
     componentDidMount(){
         const api = new Api();
-
+        this.props.refreshListRoom();
         api.get('allroom').then(response=>{
             this.setState({userInfor:response.data})
             for(var i=0;i<response.data.length; i++){
@@ -37,9 +37,12 @@ class RoomList extends Component{
             }
 
         }).catch(err =>{
-            console.log("get user infor err "+ err);
 
         })
+    }
+
+    componentDidUpdate() {
+        document.querySelector('#roomList').scrollTo(0, document.querySelector('#roomList').scrollHeight)
     }
     
     onChange = value => {
@@ -124,6 +127,23 @@ class RoomList extends Component{
 
     }
 
+    marks = {
+        0: {
+            style: {
+              color: '#ff8177',
+              
+            },
+            label: <strong>0</strong>,
+          },
+
+        2000: {
+          style: {
+            color: '#ff8177',
+          },
+          label: <strong>2000</strong>,
+        },
+      };
+
 
     render(){
         const {inputValue, visible, ModalText, confirmLoading } = this.state;
@@ -150,28 +170,22 @@ class RoomList extends Component{
                             </p>
                         </Row>
                         <Row>
-                            <Col span={12}>
+                           
+
                                 <Slider
+                                marks={this.marks}
                                 min={0}
                                 max={2000}
                                 onChange={this.onChange}
                                 value={typeof inputValue === 'number' ? inputValue : 0}
                                />
-                            </Col>
-                            <Col span={4}>
-                                <InputNumber
-                                min={0}
-                                max={2000}
-                                style={{ marginLeft: 16 }}
-                                value={inputValue}
-                                onChange={this.onChange}
-                                />
-                            </Col>
+                              
+                          
                         </Row>               
                     </Modal>
                 </div>
             </Card.Header>   
-            <div className="scrollbar scrollbar-rare-wind roomList">
+            <div id="roomList" className="scrollbar scrollbar-rare-wind roomList">
 
               {this.createRoomItemList()}
             </div>
@@ -191,6 +205,7 @@ const mapDispatchToProps = (dispatch) =>{
     return{
         createNewRoom: roomInfor => dispatch(indexAction.createNewRoom(roomInfor)),
         createListRoom: roomInfor => dispatch(indexAction.createListRoom(roomInfor)),
+        refreshListRoom: roomInfor =>dispatch(indexAction.refreshListRoom())
     }
 }
 

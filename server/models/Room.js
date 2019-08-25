@@ -52,7 +52,6 @@ class Room {
             // get room to send all client
             client.hgetall('room:' + roomId, (err, object) => {
                 if(err) {
-                    console.log(err);
                     reject(err);
                 } else {
                     resolve(object);

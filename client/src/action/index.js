@@ -35,6 +35,12 @@ export const createListRoom = (roomInfor) =>{
     }
 }
 
+export const refreshListRoom = ()=>{
+    return{
+        type: actionTypes.REFRESH_LIST_ROOM,
+    }
+}
+
 export const deleteRoom = (roomInfor) =>{
     return{
         type: actionTypes.DELETE_ROOM,

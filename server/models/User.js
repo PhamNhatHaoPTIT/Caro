@@ -11,31 +11,41 @@ class User {
     constructor(app) {
         this.app = app;
     }
-
     checkUser(user, callback = () => {}) {
         const username = lodash.get(user, 'username', '');
         const password = lodash.get(user, 'password', '');
 
         let check = true;
 
-        if (!helper.isUserNameAndPassword(username) || username.length < 1 || username.length > 20) check = false;
+        if (!helper.isUserNameAndPassword(username) || username.length < 1 || username.length > 20) {
+            check = false;
+        }
 
-        if (!helper.isUserNameAndPassword(password) || password.length < 1 || password.length > 20) check = false;
+        if (!helper.isUserNameAndPassword(password) || password.length < 1 || password.length > 20) {
+            check = false;
+        }
 
         if (!check) {
             const err = "Invalid value";
-            return callback({err: err}, null);
+            return callback({
+                error_message: err,
+                message: err
+            }, null);
         }
 
+        // check username is exist in db
         this.app.db.collection('users').findOne({"username": username}, (err, result) => {
             if (err || result) {
                 const err = "Username is already exist";
-                return callback({err: err}, null);
+                return callback({
+                    error_message: err,
+                    message: err
+                }, null);
             }
-            const hashedPassword = bcrypt.hashSync(password, 10);
+            const hashPassword = bcrypt.hashSync(password, 10);
             const userFormat = {
                 username: username,
-                password: hashedPassword,
+                password: hashPassword,
                 win_game: 0,
                 total_game: 0,
                 point: 100
@@ -49,21 +59,28 @@ class User {
         return new Promise((resolve, reject) => {
             this.checkUser(user, (err, user) => {
                 if (err) {
-                    reject(err);
+                    return reject(err);
                 }
                 db.collection('users').insertOne(user, (err, info) => {
                     if (err) {
-                        reject({error: "Do not save user."});
+                        return reject({
+                            error_message: "Do not save user.",
+                            message: "Do not save user."
+                        });
                     }
+                    
                     // create token
-                    token.createToken(lodash.get(user, 'username')).then((token) => {
+                    token.createToken(lodash.get(user, 'username')).then((tokenObj) => {
                         let data = {};
                         lodash.unset(user, 'password');
-                        data.token = token;
+                        data.token = tokenObj;
                         data.user = user;
-                        resolve(data);
+                        return resolve(data);
                     }).catch((err) => {
-                        reject({err: err});
+                        return reject({
+                            error_message: "Login failed",
+                            message: "Login failed"
+                        })
                     })
                 });
             });
@@ -74,22 +91,15 @@ class User {
         this.app.db.collection('users').findOne({username: username}, (err, result) => {
             if (err || !result) {
                 const err = "User not found";
-                return callback({err: err}, null);
+                return callback({
+                    error_message: err,
+                    message: err
+                }, null);
             }
             return callback(null, result);
-        });
+        })
     }
 
-    findUser(username) {
-        return new Promise((resolve, reject) => {
-            this.app.db.collection('users').findOne({username: username}, (err, result) => {
-                if (err || !result) {
-                    reject(err);
-                }
-                resolve(result);
-            });
-        });
-    }
 
     login(user) {
         const username = lodash.get(user, 'username');
@@ -97,27 +107,39 @@ class User {
         return new Promise((resolve, reject) => {
             if (!username || !password || !helper.isUserNameAndPassword(username) || !helper.isUserNameAndPassword(password)) {
                 const err = "Invalid value";
-                reject({err: err});
+                return reject({
+                    error_message: err,
+                    message: err
+                });
             }
 
             this.findUserByUsername(username, (err, result) => {
                 if (err) {
-                    reject({err: "Login failed"});
+                    return reject({
+                        error_message: "Login failed",
+                        message: "Login failed"
+                    });
                 }
-                const hashedPassword = lodash.get(result, 'password');
-                const check = bcrypt.compareSync(password, hashedPassword);
+                const hashPassword = lodash.get(result, 'password');
+                const check = bcrypt.compareSync(password, hashPassword);
                 if (!check) {
-                    reject({err: "Login failed"});
+                    return reject({
+                        error_message: "Login failed",
+                        message: "Login failed"
+                    });
                 }
                 // create token
-                token.createToken(lodash.get(result, 'username')).then((token) => {
+                token.createToken(lodash.get(result, 'username')).then((tokenObj) => {
                     let data = {};
                     lodash.unset(result, 'password');
-                    data.token = token;
+                    data.token = tokenObj;
                     data.user = result;
-                    resolve(data);
+                    return resolve(data);
                 }).catch((err) => {
-                    reject({err: err});
+                    return reject({
+                        error_message: "Login failed",
+                        message: "Login failed"
+                    })
                 })
             });
         })

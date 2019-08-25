@@ -13,11 +13,15 @@ class Board extends Component{
 
    constructor(props){
       super(props);
-
+      
+      let host='';
+      if(JSON.parse(localStorage.getItem('roomInfor')))
+          host = JSON.parse(localStorage.getItem('roomInfor')).host;
+  
       this.state = {
          board: this.props.board,
          gameEnded: false,
-         host: JSON.parse(localStorage.getItem('roomInfor')).host,
+         host: host,
          canGo: this.props.canGo,
          result : this.props.result,
          visible: this.props.visible,
@@ -239,7 +243,6 @@ class Board extends Component{
   };
 
   handleOk = e => {
-    console.log("ok "+e);
     this.props.history.push({
         pathname: '/'
     })
@@ -275,7 +278,6 @@ class Board extends Component{
 
 
 function mapStatetoProps(state){
-    console.log("state visible "+state.boardGame.visible)
 
    return{
      board: state.boardGame.board,

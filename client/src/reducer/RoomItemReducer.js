@@ -10,12 +10,13 @@ export default (state = [], action) => {
     switch(action.type){
         case actionTypes.CREATE_NEW_ROOM:
             return[...state,Object.assign({},action.roomInfor)];
-
+    
         case actionTypes.CREATE_LIST_ROOM:
             return[...state,Object.assign({},action.roomInfor)];
 
+        case actionTypes.REFRESH_LIST_ROOM:
+                return []
         case actionTypes.DELETE_ROOM:
-            console.log("delete room "+ JSON.stringify(state)+" "+JSON.stringify(action.roomInfor)+" "+(state[0].id != action.roomInfor.id && typeof state[0].id !== undefined) ||state[0].host != action.roomInfor.host )
             var newState= new ArrayList;
             for(let i=0;i<state.length;i++)
                 
@@ -23,7 +24,6 @@ export default (state = [], action) => {
                 {
                     newState.add(state[i])
                 }
-            console.log("after delete room "+ JSON.stringify(newState))
 
             return newState
  
