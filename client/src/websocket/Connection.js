@@ -108,11 +108,14 @@ export default class Connection {
 
     handleResultGame(data){
         this.store.dispatch(indexAction.createResultGame(data))
+    }
 
-        //alert("You lose");
-
+    handleRank(data){
+        this.store.dispatch(indexAction.refreshRankuser());
+        data.map(rank => this.store.dispatch(indexAction.createRankUser(rank)))
 
     }
+
 
     handleMessage(message){
         const header = lodash.get(message, 'header');
@@ -134,6 +137,9 @@ export default class Connection {
             case 'game_result':
                 this.handleResultGame(data);
                 break;    
+            case 'rank':
+                this.handleRank(data);
+                break;
 
             default:
                 break;

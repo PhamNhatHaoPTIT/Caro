@@ -30,7 +30,8 @@ export default (state = [], action) => {
             newState.result = "You "+ action.boardGame.result;
             newState.visible = true;
             return newState;    
-         
+        case actionTypes.CREATE_MESSAGE:
+            return state;
         default:
             state.board = new Array(100).fill('');
             state.result = "Draw";
