@@ -26,12 +26,17 @@ class Dashboard extends Component{
 
 
     componentDidMount(){
+        console.log("user infor "+ JSON.stringify())
         const api = new Api();
 
         // get infor user
         api.get('user/'+JSON.parse(localStorage.getItem('userInfor'))._id,
            ).then(response=>{
             localStorage.setItem('userInfor',JSON.stringify(response.data))
+
+            console.log("user infor "+ JSON.stringify(response.data))
+
+
             this.setState({userInfor:response.data})
 
         })

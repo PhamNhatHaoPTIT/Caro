@@ -12,7 +12,7 @@ import HeaderBar from '../HeaderBar/HeaderBar'
 class BoardGame extends Component{
 
     render(){
-
+        console.log("abc "+this.props.location.state.roomInfor)
         return(
             <main>
             <Layout>
@@ -23,7 +23,7 @@ class BoardGame extends Component{
             <Container>
             <Row>
                 <Col  xl={8} lg={12} md={12} sm={12} >
-                    <Board >
+                    <Board roomInfor={this.props.location.state.roomInfor}>
                     </Board>
                 </Col>
                 <Col xl={4} lg={12} md={12} sm={12}>

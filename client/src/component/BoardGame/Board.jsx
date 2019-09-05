@@ -14,14 +14,14 @@ class Board extends Component{
    constructor(props){
       super(props);
       
-      let host='';
-      if(JSON.parse(localStorage.getItem('roomInfor')))
-          host = JSON.parse(localStorage.getItem('roomInfor')).host;
+    //   let host='';
+    //   if(JSON.parse(localStorage.getItem('roomInfor')))
+    //       host = JSON.parse(localStorage.getItem('roomInfor')).host;
   
       this.state = {
          board: this.props.board,
          gameEnded: false,
-         host: host,
+         host: this.props.roomInfor.host,
          canGo: this.props.canGo,
          result : this.props.result,
          visible: this.props.visible,

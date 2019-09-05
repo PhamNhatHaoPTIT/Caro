@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import 'antd/dist/antd.css';
 import './Login.css';
-import {Container,Row,Col} from 'react-bootstrap';
+import {Container,Row} from 'react-bootstrap';
 import Logo from './../Logo/Logo'
 import CardLogin from './CardLogin'
 

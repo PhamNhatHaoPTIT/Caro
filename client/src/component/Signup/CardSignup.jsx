@@ -67,8 +67,8 @@ class CardSignup extends Component{
       
         const { form } = this.props;
 
-        if ( form.getFieldValue('username').length <4 || form.getFieldValue('username').length >14) {
-          callback('Username must length between 4 to 14');
+        if ( form.getFieldValue('username').length <4 || form.getFieldValue('username').length >14 || form.getFieldValue('username').includes(" ")) {
+          callback('Username must length between 4 to 14 and no space');
         } else {
           callback();
         }
@@ -85,8 +85,9 @@ class CardSignup extends Component{
     
     validateToNextPassword = (rule, value, callback) => {
         const { form } = this.props;
-        if ( form.getFieldValue('password').length <4 || form.getFieldValue('password').length >14) {
-            callback('Password must length between 4 to 14');
+
+        if ( form.getFieldValue('password').length <4 || form.getFieldValue('password').length >14 || form.getFieldValue('password').includes(" ")) {
+            callback('Password must length between 4 to 14 and no space');
           } else {
             if (value && this.state.confirmDirty) {
                 form.validateFields(['confirm'], { force: true });
@@ -120,7 +121,7 @@ class CardSignup extends Component{
                             ],
                         })(
                             <Input
-                            prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                            prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} pattern="[^' ']+" />}
                             placeholder="Username"
                             />,
                         )}
@@ -138,7 +139,7 @@ class CardSignup extends Component{
                             ],
                         })(
                             <Input
-                            prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                            prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} pattern="[^' ']+"/>}
                             type="password"
                             placeholder="Password"
                             />,
@@ -158,7 +159,7 @@ class CardSignup extends Component{
                             ],
                         })(
                             <Input
-                            prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                            prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }}  pattern="[^' ']+"/>}
                             type="password"
                             placeholder="Password"
                             />,

@@ -46,7 +46,7 @@ class RoomItem extends Component{
             this.props.history.push({
                 pathname: '/game',
                 state:{
-                    joinInfor: joinInfor
+                    roomInfor: joinInfor
                 }
             })
         }

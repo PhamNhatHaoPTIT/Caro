@@ -7,7 +7,7 @@ export default (state = [], action) => {
         case actionTypes.CREATE_MESSAGE:
             return[...state,Object.assign({},action.chatMessage)];
         default:
-            return state;
+            return [];
     }
 
 

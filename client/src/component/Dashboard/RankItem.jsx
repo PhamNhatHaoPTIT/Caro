@@ -26,7 +26,7 @@ export default class RoomItem extends Component{
                         <img className="avatar-rank" alt=''></img>
                     </Col>
                     <Col lg="9" sm="12"  >
-                        <Card.Title><span> {this.state.username} -  {this.state.point} </span>  </Card.Title>
+                        <Card.Title><span> {this.state.username} -  {this.state.point} p</span>  </Card.Title>
                         
                     </Col>
                 </Row>

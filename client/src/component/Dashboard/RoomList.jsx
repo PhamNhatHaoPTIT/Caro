@@ -58,10 +58,9 @@ class RoomList extends Component{
       };
     
     handleOk = () => { 
-        const api = new Api();
 
  
-        if(this.state.point>=this.state.inputValue){ 
+        if(JSON.parse(localStorage.getItem('userInfor')).point>=this.state.inputValue){ 
             this.setState({
                 confirmLoading: true,
             });
@@ -74,8 +73,8 @@ class RoomList extends Component{
                 
             }
 
-            this.state.point-=this.state.inputValue;
-            helper.addToLocalStorageObject("userInfor","point",this.state.point);
+            // this.state.point-=this.state.inputValue;
+            // helper.addToLocalStorageObject("userInfor","point",this.state.point);
 
             
             setTimeout(() => {
@@ -88,6 +87,8 @@ class RoomList extends Component{
             this.props.createNewRoom(roomInfor);
             this.props.history.push({
                 pathname: '/game',
+                state: {roomInfor: roomInfor},
+
               })
 
         
